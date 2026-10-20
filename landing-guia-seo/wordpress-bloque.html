@@ -1,0 +1,504 @@
+<!--
+  LANDING GUÍA SEO · BLOQUE PARA WORDPRESS
+  Pega TODO este archivo en un único bloque «HTML personalizado».
+  El título SEO, la descripción y la URL canónica NO van aquí:
+  ponlos en tu plugin de SEO (Yoast, Rank Math...) al editar la página.
+-->
+
+<!-- Estilos de Brevo (necesarios para el formulario) -->
+<style>
+  :where(.sib-form-message-panel) { display: none; }
+  :where(.sib-form-message-panel .sib-notification__icon) { width: 20px; height: 20px; }
+</style>
+<link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap">
+
+<!-- Estilos de la landing (solo afectan a esta página) -->
+<style>
+  .nexia-landing {
+    --azul: #2e4be2;
+    --azul-oscuro: #00367d;
+    --fondo-suave: #e9f6f5;
+    --texto: #111111;
+    --texto-suave: #4a4a4a;
+    --blanco: #ffffff;
+    --borde: #dfe3ee;
+    font-family: "Montserrat", Arial, sans-serif;
+    color: var(--texto);
+    line-height: 1.6;
+    font-size: 17px;
+  }
+
+  .nexia-landing * { box-sizing: border-box; }
+  .nexia-landing a { color: var(--azul); }
+
+  .nexia-landing .contenedor {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .nexia-landing .hero {
+    padding-top: 64px;
+    padding-bottom: 64px;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .nexia-landing .etiqueta {
+    display: inline-block;
+    background: var(--fondo-suave);
+    color: var(--azul-oscuro);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  .nexia-landing h1 {
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 42px;
+    line-height: 1.15;
+    font-weight: 800;
+    margin: 0 0 20px;
+    color: var(--texto);
+  }
+
+  .nexia-landing h1 span { color: var(--azul); }
+
+  .nexia-landing .subtitulo {
+    font-size: 19px;
+    color: var(--texto-suave);
+    margin: 0 0 24px;
+  }
+
+  .nexia-landing .datos {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .nexia-landing .datos li::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--azul);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .nexia-landing section { padding: 64px 0; }
+  .nexia-landing .fondo-suave { background: var(--fondo-suave); }
+
+  .nexia-landing section h2 {
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 30px;
+    line-height: 1.25;
+    margin: 0 0 32px;
+    color: var(--texto);
+  }
+
+  .nexia-landing .rejilla {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .nexia-landing .tarjeta {
+    background: var(--blanco);
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid var(--borde);
+  }
+
+  .nexia-landing .tarjeta .numero {
+    font-weight: 800;
+    color: var(--azul);
+    font-size: 14px;
+  }
+
+  .nexia-landing .tarjeta h3 {
+    font-family: "Montserrat", Arial, sans-serif;
+    font-size: 18px;
+    margin: 8px 0;
+    color: var(--texto);
+  }
+
+  .nexia-landing .tarjeta p {
+    margin: 0;
+    color: var(--texto-suave);
+    font-size: 15px;
+  }
+
+  .nexia-landing .dos-columnas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+
+  .nexia-landing .lista { padding-left: 20px; margin: 0; }
+  .nexia-landing .lista li { margin-bottom: 12px; }
+
+  .nexia-landing .aviso {
+    border-left: 4px solid var(--azul);
+    padding: 20px 24px;
+    background: var(--blanco);
+    border-radius: 0 12px 12px 0;
+  }
+
+  .nexia-landing .aviso p { margin: 0; }
+
+  .nexia-landing .cierre { text-align: center; }
+
+  .nexia-landing .cierre p {
+    max-width: 620px;
+    margin: 0 auto 28px;
+    color: var(--texto-suave);
+  }
+
+  .nexia-landing .boton {
+    display: inline-block;
+    background: var(--azul);
+    color: var(--blanco);
+    border-radius: 10px;
+    padding: 16px 40px;
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nexia-landing .boton:hover { background: var(--azul-oscuro); color: var(--blanco); }
+
+  /* ---------- Formulario de Brevo con el estilo de Nexia ---------- */
+
+  .nexia-landing .sib-form {
+    background: transparent !important;
+    padding: 0 !important;
+    text-align: left !important;
+  }
+
+  .nexia-landing #sib-container {
+    max-width: 100% !important;
+    background: var(--blanco) !important;
+    border: 1px solid var(--borde) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 40px rgba(0, 54, 125, 0.10) !important;
+    padding: 24px 28px !important;
+  }
+
+  .nexia-landing #sib-container,
+  .nexia-landing #sib-container p,
+  .nexia-landing #sib-container span,
+  .nexia-landing #sib-container input,
+  .nexia-landing #sib-container button {
+    font-family: "Montserrat", Arial, sans-serif !important;
+  }
+
+  .nexia-landing #sib-container .nexia-form-titulo {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: var(--texto) !important;
+    text-align: left !important;
+  }
+
+  .nexia-landing #sib-container .nexia-form-titulo p,
+  .nexia-landing #sib-container .nexia-form-texto p { margin: 0 !important; }
+
+  .nexia-landing #sib-container .nexia-form-texto {
+    font-size: 15px !important;
+    color: var(--texto-suave) !important;
+    text-align: left !important;
+  }
+
+  .nexia-landing #sib-container input.input {
+    border: 1px solid var(--borde) !important;
+    border-radius: 10px !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    color: var(--texto) !important;
+    height: auto !important;
+  }
+
+  .nexia-landing #sib-container input.input:focus {
+    outline: 2px solid var(--azul) !important;
+    border-color: var(--azul) !important;
+  }
+
+  .nexia-landing #sib-container input::placeholder {
+    font-family: "Montserrat", Arial, sans-serif !important;
+    color: #9aa3b5 !important;
+  }
+
+  .nexia-landing #sib-container .sib-optin span {
+    font-size: 13px !important;
+    color: var(--texto-suave) !important;
+  }
+
+  .nexia-landing #sib-container .sib-optin p { margin: 0 !important; }
+
+  .nexia-landing #sib-container a {
+    color: var(--azul) !important;
+    text-decoration: underline;
+  }
+
+  .nexia-landing #sib-container .sib-form-block__button {
+    width: 100% !important;
+    background: var(--azul) !important;
+    color: var(--blanco) !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    padding: 16px 24px !important;
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    margin: 0 !important;
+  }
+
+  .nexia-landing #sib-container .sib-form-block__button:hover {
+    background: var(--azul-oscuro) !important;
+  }
+
+  /* Respaldo por si la hoja de estilos de Brevo tarda en cargar */
+  .nexia-landing #sib-container .input--hidden { display: none !important; }
+  .nexia-landing #sib-container .sib-hide-loader-icon { display: none !important; }
+  .nexia-landing #sib-container .progress-indicator__icon { width: 18px; height: 18px; fill: currentColor; }
+  .nexia-landing #sib-container .entry__field input.input { width: 100% !important; }
+  .nexia-landing #sib-container .entry__choice label {
+    display: flex !important;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .nexia-landing #sib-container .entry__choice input[type="checkbox"] { margin-top: 4px; flex-shrink: 0; }
+
+  .nexia-landing .sib-form-message-panel {
+    max-width: 100% !important;
+    border-radius: 10px !important;
+    font-family: "Montserrat", Arial, sans-serif !important;
+  }
+
+  @media (max-width: 860px) {
+    .nexia-landing .hero,
+    .nexia-landing .dos-columnas { grid-template-columns: 1fr; gap: 32px; }
+    .nexia-landing .rejilla { grid-template-columns: 1fr; }
+    .nexia-landing .hero { padding-top: 40px; padding-bottom: 40px; }
+    .nexia-landing h1 { font-size: 32px; }
+    .nexia-landing section { padding: 48px 0; }
+    .nexia-landing section h2 { font-size: 25px; }
+    .nexia-landing #sib-container { padding: 20px !important; }
+  }
+</style>
+
+<div class="nexia-landing">
+
+  <div class="contenedor hero">
+    <div>
+      <span class="etiqueta">Guía gratuita en Notion</span>
+      <h1>Tu web creada con IA, <span>lista para que Google pueda encontrarla</span></h1>
+      <p class="subtitulo">Una guía paso a paso para publicar tu landing, revisar su SEO básico y conectarla con Google Search Console. Sin saber programar y sin tecnicismos.</p>
+      <ul class="datos">
+        <li>Para principiantes</li>
+        <li>Plantilla duplicable</li>
+        <li>Con checklists y prompts</li>
+      </ul>
+    </div>
+
+    <!-- ===== FORMULARIO DE BREVO ===== -->
+    <div id="registro" class="sib-form">
+      <div id="sib-form-container" class="sib-form-container">
+        <div id="error-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949;">
+          <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+            <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+              <path d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z" />
+            </svg>
+            <span class="sib-form-message-panel__inner-text">No hemos podido validar tu suscripción.</span>
+          </div>
+        </div>
+        <div></div>
+        <div id="success-message" class="sib-form-message-panel" style="font-size:16px; text-align:left; color:#085229; background-color:#e7faf0; border-color:#13ce66;">
+          <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+            <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon">
+              <path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z" />
+            </svg>
+            <span class="sib-form-message-panel__inner-text">Listo. Revisa tu correo: te hemos enviado el enlace a la guía.</span>
+          </div>
+        </div>
+        <div></div>
+        <div id="sib-container" class="sib-container--large sib-container--vertical" style="direction:ltr">
+          <form id="sib-form" method="POST" action="https://6fd166df.sibforms.com/serve/MUIFAD7QVbu-ccTxstJ_wGaJRrB8c1tzfxg705t7L2WE0zUENnSS0wIxhaXZ9kAn04RfJUYZZFAXvV-Oj10vzqU0K5JqbDVt-plxe3pD6Jl3I3zBr8yJHlsmqDYmLu_mSDqoYPNhERA9lptss6P9H2AJ_9I7woBOQeOkm_st4hkym48XcqOj1XiWSwuXykoDis_PxAZj1yXkd8kd" data-type="subscription">
+
+            <div style="padding: 8px 0;">
+              <div class="sib-form-block nexia-form-titulo">
+                <p>Recibe la guía en tu correo</p>
+              </div>
+            </div>
+
+            <div style="padding: 0 0 8px;">
+              <div class="sib-form-block nexia-form-texto">
+                <div class="sib-text-form-block">
+                  <p>Déjanos tu nombre y tu email y te enviamos el enlace.</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 8px 0;">
+              <div class="sib-input sib-form-block">
+                <div class="form__entry entry_block">
+                  <div class="form__label-row ">
+                    <div class="entry__field">
+                      <input class="input " maxlength="200" type="text" id="name" name="COMPANY:name" autocomplete="off" placeholder="Tu nombre" data-required="true" required />
+                    </div>
+                  </div>
+                  <label class="entry__error entry__error--primary" style="font-size:14px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949; border-radius:6px;"></label>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 8px 0;">
+              <div class="sib-input sib-form-block">
+                <div class="form__entry entry_block">
+                  <div class="form__label-row ">
+                    <div class="entry__field">
+                      <input class="input " type="text" id="EMAIL" name="EMAIL" autocomplete="off" value="" placeholder="Tu email" data-required="true" required />
+                    </div>
+                  </div>
+                  <label class="entry__error entry__error--primary" style="font-size:14px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949; border-radius:6px;"></label>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 8px 0;">
+              <div class="sib-optin sib-form-block" data-required="true">
+                <div class="form__entry entry_mcq">
+                  <div class="form__label-row ">
+                    <div class="entry__choice">
+                      <label>
+                        <input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN" required />
+                        <span class="checkbox checkbox_tick_positive"></span><span style="text-align:left; background-color:transparent;"><p>Acepto recibir vuestros emails y confirmo que he leído la <a href="https://somosnexia.com/privacy-policy/" target="_blank" rel="nofollow noopener">política de privacidad</a>. Puedo darme de baja cuando quiera.</p><span data-required="*" style="display: inline;" class="entry__label entry__label_optin"></span></span>
+                      </label>
+                    </div>
+                  </div>
+                  <label class="entry__error entry__error--primary" style="font-size:14px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949; border-radius:6px;"></label>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 8px 0;">
+              <div class="sib-form-block">
+                <button class="sib-form-block__button sib-form-block__button-with-loader" form="sib-form" type="submit">
+                  <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512">
+                    <path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" />
+                  </svg>
+                  Quiero la guía
+                </button>
+              </div>
+            </div>
+
+            <input type="text" name="email_address_check" value="" class="input--hidden">
+            <input type="hidden" name="locale" value="es">
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- ===== FIN FORMULARIO DE BREVO ===== -->
+  </div>
+
+  <section class="fondo-suave">
+    <div class="contenedor">
+      <h2>Qué vas a aprender</h2>
+      <div class="rejilla">
+        <div class="tarjeta">
+          <span class="numero">01</span>
+          <h3>Dónde está tu web</h3>
+          <p>Identificar dónde está alojada, dónde se edita y quién tiene acceso al dominio.</p>
+        </div>
+        <div class="tarjeta">
+          <span class="numero">02</span>
+          <h3>SEO sin jerga</h3>
+          <p>Entender rastreo, indexación y posicionamiento con ejemplos sencillos.</p>
+        </div>
+        <div class="tarjeta">
+          <span class="numero">03</span>
+          <h3>Las etiquetas básicas</h3>
+          <p>Revisar el título, la descripción y los encabezados, con ejemplos de antes y después.</p>
+        </div>
+        <div class="tarjeta">
+          <span class="numero">04</span>
+          <h3>Google Search Console</h3>
+          <p>Dar de alta tu web y verificar que es tuya, paso a paso.</p>
+        </div>
+        <div class="tarjeta">
+          <span class="numero">05</span>
+          <h3>Pedir la indexación</h3>
+          <p>Avisar a Google de tu página y comprobar después su estado.</p>
+        </div>
+        <div class="tarjeta">
+          <span class="numero">06</span>
+          <h3>Errores frecuentes</h3>
+          <p>Saber qué significan los avisos más habituales y qué hacer con cada uno.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="contenedor dos-columnas">
+      <div>
+        <h2>Para quién es esta guía</h2>
+        <ul class="lista">
+          <li>Has creado tu web o tu landing con inteligencia artificial.</li>
+          <li>No sabes si está bien publicada ni si Google puede verla.</li>
+          <li>No programas y no quieres depender de nadie para lo básico.</li>
+          <li>Quieres entender lo que haces, no copiar códigos sin saber para qué sirven.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Marketing sin humo</h2>
+        <div class="aviso">
+          <p>Nadie puede garantizarte el primer puesto en Google, y nosotras tampoco te lo vamos a prometer. Lo que sí te damos es un método claro para quitar obstáculos y hacerlo bien desde el principio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fondo-suave cierre">
+    <div class="contenedor">
+      <h2>Deja de preguntarte si Google ve tu web</h2>
+      <p>Recibe la guía en tu correo, duplícala en tu Notion y síguela a tu ritmo, con fichas para rellenar y una checklist final.</p>
+      <a class="boton" href="#registro">Quiero la guía gratuita</a>
+    </div>
+  </section>
+
+</div>
+
+<!-- Scripts de Brevo (necesarios para que el formulario funcione) -->
+<script>
+  window.REQUIRED_CODE_ERROR_MESSAGE = 'Elige un código de país';
+  window.LOCALE = 'es';
+  window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "La información que has proporcionado no es válida. Compruebe el formato del campo e inténtalo de nuevo.";
+  window.REQUIRED_ERROR_MESSAGE = "Ups! este campo no puede quedarse vacío. ";
+  window.GENERIC_INVALID_MESSAGE = "La información que has proporcionado no es válida. Compruebe el formato del campo e inténtalo de nuevo.";
+  window.INVALID_NUMBER = "La información que has proporcionado no es válida. Compruebe el formato del campo e inténtalo de nuevo.";
+  window.INVALID_DATE = "Introduce una fecha válida";
+  window.REQUIRED_MULTISELECT_MESSAGE = 'Selecciona al menos una opción';
+  window.translation = {
+    common: {
+      selectedList: '{quantity} lista seleccionada',
+      selectedLists: '{quantity} listas seleccionadas',
+      selectedOption: '{quantity} seleccionado',
+      selectedOptions: '{quantity} seleccionados',
+    }
+  };
+  var AUTOHIDE = Boolean(0);
+</script>
+<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
