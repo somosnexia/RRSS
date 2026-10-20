@@ -240,7 +240,7 @@
     color: #9aa3b5 !important;
   }
 
-  .nexia-landing #sib-container .sib-optin span {
+  .nexia-landing #sib-container .sib-optin span:not(.checkbox) {
     font-size: 13px !important;
     color: var(--texto-suave) !important;
   }
@@ -274,12 +274,33 @@
   .nexia-landing #sib-container .sib-hide-loader-icon { display: none !important; }
   .nexia-landing #sib-container .progress-indicator__icon { width: 18px; height: 18px; fill: currentColor; }
   .nexia-landing #sib-container .entry__field input.input { width: 100% !important; }
+  /* Casilla de aceptación: usamos la casilla normal del navegador,
+     más fiable que la casilla dibujada por Brevo dentro de WordPress */
   .nexia-landing #sib-container .entry__choice label {
     display: flex !important;
     gap: 10px;
     align-items: flex-start;
+    padding-left: 0 !important;
+    text-indent: 0 !important;
+    cursor: pointer;
   }
-  .nexia-landing #sib-container .entry__choice input[type="checkbox"] { margin-top: 4px; flex-shrink: 0; }
+  .nexia-landing #sib-container .entry__choice .checkbox { display: none !important; }
+  .nexia-landing #sib-container .entry__choice input[type="checkbox"] {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    clip: auto !important;
+    pointer-events: auto !important;
+    -webkit-appearance: checkbox !important;
+    appearance: auto !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    margin: 2px 0 0 !important;
+    accent-color: var(--azul);
+    flex-shrink: 0;
+  }
 
   .nexia-landing .sib-form-message-panel {
     max-width: 100% !important;
