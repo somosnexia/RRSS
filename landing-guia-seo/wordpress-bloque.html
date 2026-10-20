@@ -122,6 +122,16 @@
     border: 1px solid var(--borde);
   }
 
+  .nexia-landing h1,
+  .nexia-landing h2,
+  .nexia-landing h3 {
+    font-family: "Poppins", Arial, sans-serif !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+  }
+  .nexia-landing section h2 { font-weight: 700 !important; }
+  .nexia-landing .tarjeta h3 { font-weight: 600 !important; }
+
   .nexia-landing .tarjeta .numero {
     font-weight: 800;
     color: var(--azul);
@@ -566,3 +576,25 @@
   var AUTOHIDE = Boolean(0);
 </script>
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+
+<!-- Redirección a la página de gracias cuando el registro sale bien -->
+<script>
+  (function () {
+    // SUSTITUYE por la dirección real de tu página de gracias
+    var URL_GRACIAS = 'https://somosnexia.com/gracias-guia-seo/';
+
+    var panel = document.getElementById('success-message');
+    if (!panel) return;
+    var enviado = false;
+
+    function comprobar() {
+      if (enviado) return;
+      if (window.getComputedStyle(panel).display !== 'none') {
+        enviado = true;
+        window.location.href = URL_GRACIAS;
+      }
+    }
+
+    new MutationObserver(comprobar).observe(panel, { attributes: true, attributeFilter: ['style', 'class'] });
+  })();
+</script>
