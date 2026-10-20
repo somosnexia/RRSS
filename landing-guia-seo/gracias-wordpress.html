@@ -1,0 +1,70 @@
+<!--
+  PÁGINA DE GRACIAS · BLOQUE PARA WORDPRESS
+  Pega TODO este archivo en un bloque «HTML personalizado» de la página de gracias.
+  En tu plugin de SEO, marca esta página como «noindex» (que no aparezca en Google).
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
+
+<style>
+  .nexia-gracias {
+    font-family: "Poppins", Arial, sans-serif;
+    background: #e9f6f5;
+    padding: 64px 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .nexia-gracias * { box-sizing: border-box; }
+  .nexia-gracias .caja {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0, 54, 125, 0.10);
+  }
+  .nexia-gracias h1 {
+    font-family: "Poppins", Arial, sans-serif;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 800;
+    color: #111111;
+    margin: 0 0 16px;
+  }
+  .nexia-gracias p {
+    color: #4a4a4a;
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0 0 24px;
+  }
+  .nexia-gracias .boton {
+    display: inline-block;
+    background: #2e4be2;
+    color: #ffffff !important;
+    border-radius: 10px;
+    padding: 16px 40px;
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none !important;
+  }
+  .nexia-gracias .boton:hover { background: #00367d; }
+  .nexia-gracias .nota { font-size: 14px; margin: 24px 0 0; }
+
+  @media (max-width: 480px) {
+    .nexia-gracias { padding: 32px 16px; }
+    .nexia-gracias .caja { padding: 28px 20px; }
+    .nexia-gracias h1 { font-size: 25px; }
+    .nexia-gracias p { font-size: 16px; }
+    .nexia-gracias .boton { display: block; width: 100%; padding: 16px 20px; }
+  }
+</style>
+
+<div class="nexia-gracias">
+  <div class="caja">
+    <h1>¡Ya tienes tu guía!</h1>
+    <p>Gracias por registrarte. Ábrela aquí y, si quieres, duplícala en tu Notion para rellenar las fichas y las checklists.</p>
+    <a class="boton" href="https://vigorous-rock-272.notion.site/De-web-creada-con-IA-a-web-que-Google-puede-encontrar-gu-a-de-SEO-e-indexaci-n-de-inicio-3ffb4b4dc03c813ea4f5cc0031814a69" target="_blank" rel="noopener">Abrir la guía</a>
+    <!-- Borra esta frase si no has configurado en Brevo el email automático con el enlace -->
+    <p class="nota">También te hemos enviado el enlace a tu correo. Si no lo ves, mira en spam o en promociones.</p>
+  </div>
+</div>
