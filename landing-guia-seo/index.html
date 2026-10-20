@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guía gratuita: SEO e indexación para webs creadas con IA | Somos Nexia</title>
+  <meta name="description" content="Guía gratuita paso a paso para publicar tu web creada con IA, revisar su SEO básico y conectarla con Google Search Console. Sin saber programar.">
+  <!-- SUSTITUYE por la dirección definitiva de esta landing -->
+  <link rel="canonical" href="https://somosnexia.com/guia-seo-web-ia/">
+
+  <meta property="og:title" content="Guía gratuita: de web creada con IA a web que Google puede encontrar">
+  <meta property="og:description" content="Publica tu landing, revisa su SEO básico y conéctala con Google Search Console. Paso a paso y sin programar.">
+  <meta property="og:url" content="https://somosnexia.com/guia-seo-web-ia/">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --azul: #2e4be2;
+      --azul-oscuro: #00367d;
+      --fondo-suave: #e9f6f5;
+      --texto: #111111;
+      --texto-suave: #4a4a4a;
+      --blanco: #ffffff;
+      --borde: #dfe3ee;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Montserrat", Arial, sans-serif;
+      color: var(--texto);
+      background: var(--blanco);
+      line-height: 1.6;
+      font-size: 17px;
+    }
+
+    a { color: var(--azul); }
+
+    .contenedor {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .marca {
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--azul-oscuro);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    .hero {
+      padding-top: 64px;
+      padding-bottom: 64px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .etiqueta {
+      display: inline-block;
+      background: var(--fondo-suave);
+      color: var(--azul-oscuro);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 42px;
+      line-height: 1.15;
+      font-weight: 800;
+      margin: 0 0 20px;
+    }
+
+    h1 span { color: var(--azul); }
+
+    .subtitulo {
+      font-size: 19px;
+      color: var(--texto-suave);
+      margin: 0 0 24px;
+    }
+
+    .datos {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .datos li::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--azul);
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .formulario {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 12px 40px rgba(0, 54, 125, 0.10);
+    }
+
+    .formulario h2 {
+      font-size: 22px;
+      margin: 0 0 8px;
+    }
+
+    .formulario p {
+      margin: 0 0 20px;
+      color: var(--texto-suave);
+      font-size: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      outline: 2px solid var(--azul);
+      border-color: var(--azul);
+    }
+
+    .consentimiento {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--texto-suave);
+      margin-bottom: 20px;
+    }
+
+    .consentimiento input { margin-top: 3px; }
+
+    .boton {
+      display: inline-block;
+      width: 100%;
+      background: var(--azul);
+      color: var(--blanco);
+      border: 0;
+      border-radius: 10px;
+      padding: 16px 24px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .boton:hover { background: var(--azul-oscuro); }
+
+    .legal {
+      font-size: 12px;
+      color: var(--texto-suave);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    section { padding: 64px 0; }
+
+    .fondo-suave { background: var(--fondo-suave); }
+
+    section h2 {
+      font-size: 30px;
+      line-height: 1.25;
+      margin: 0 0 32px;
+    }
+
+    .rejilla {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .tarjeta {
+      background: var(--blanco);
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid var(--borde);
+    }
+
+    .tarjeta .numero {
+      font-weight: 800;
+      color: var(--azul);
+      font-size: 14px;
+    }
+
+    .tarjeta h3 {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    .tarjeta p {
+      margin: 0;
+      color: var(--texto-suave);
+      font-size: 15px;
+    }
+
+    .dos-columnas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+
+    .lista {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .lista li { margin-bottom: 12px; }
+
+    .aviso {
+      border-left: 4px solid var(--azul);
+      padding: 20px 24px;
+      background: var(--blanco);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .aviso p { margin: 0; }
+
+    .cierre { text-align: center; }
+
+    .cierre p {
+      max-width: 620px;
+      margin: 0 auto 28px;
+      color: var(--texto-suave);
+    }
+
+    .cierre .boton {
+      width: auto;
+      padding: 16px 40px;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--borde);
+      font-size: 14px;
+      color: var(--texto-suave);
+    }
+
+    footer .contenedor {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .dos-columnas { grid-template-columns: 1fr; gap: 32px; }
+      .rejilla { grid-template-columns: 1fr; }
+      .hero { padding-top: 40px; padding-bottom: 40px; }
+      h1 { font-size: 32px; }
+      section { padding: 48px 0; }
+      section h2 { font-size: 25px; }
+      .formulario { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="contenedor">
+      <!-- SUSTITUYE por la dirección de tu web principal -->
+      <a class="marca" href="https://somosnexia.com/">SOMOS NEXIA</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="contenedor hero">
+      <div>
+        <span class="etiqueta">Guía gratuita en Notion</span>
+        <h1>Tu web creada con IA, <span>lista para que Google pueda encontrarla</span></h1>
+        <p class="subtitulo">Una guía paso a paso para publicar tu landing, revisar su SEO básico y conectarla con Google Search Console. Sin saber programar y sin tecnicismos.</p>
+        <ul class="datos">
+          <li>Para principiantes</li>
+          <li>Plantilla duplicable</li>
+          <li>Con checklists y prompts</li>
+        </ul>
+      </div>
+
+      <!--
+        FORMULARIO
+        Sustituye el valor de "action" por la dirección que te dé tu herramienta de email marketing,
+        o reemplaza todo este bloque por el formulario que te genere esa herramienta.
+        Revisa que los nombres de los campos (name="...") coincidan con los que pide.
+      -->
+      <form class="formulario" id="registro" action="URL-DE-TU-HERRAMIENTA-DE-EMAIL" method="post">
+        <h2>Recibe la guía en tu correo</h2>
+        <p>Déjanos tu nombre y tu email y te enviamos el enlace.</p>
+
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" autocomplete="given-name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+
+        <label class="consentimiento" for="privacidad">
+          <input type="checkbox" id="privacidad" name="privacidad" required>
+          <span>He leído y acepto la <a href="https://somosnexia.com/politica-de-privacidad/">política de privacidad</a> y quiero recibir la guía y comunicaciones de Somos Nexia.</span>
+        </label>
+
+        <button class="boton" type="submit">Quiero la guía</button>
+
+        <p class="legal">
+          <!-- SUSTITUYE por vuestros datos legales reales -->
+          Responsable: [razón social]. Finalidad: enviarte la guía y comunicaciones relacionadas. Puedes darte de baja en cualquier momento y ejercer tus derechos según se indica en la política de privacidad.
+        </p>
+      </form>
+    </div>
+
+    <section class="fondo-suave">
+      <div class="contenedor">
+        <h2>Qué vas a aprender</h2>
+        <div class="rejilla">
+          <div class="tarjeta">
+            <span class="numero">01</span>
+            <h3>Dónde está tu web</h3>
+            <p>Identificar dónde está alojada, dónde se edita y quién tiene acceso al dominio.</p>
+          </div>
+          <div class="tarjeta">
+            <span class="numero">02</span>
+            <h3>SEO sin jerga</h3>
+            <p>Entender rastreo, indexación y posicionamiento con ejemplos sencillos.</p>
+          </div>
+          <div class="tarjeta">
+            <span class="numero">03</span>
+            <h3>Las etiquetas básicas</h3>
+            <p>Revisar el título, la descripción y los encabezados, con ejemplos de antes y después.</p>
+          </div>
+          <div class="tarjeta">
+            <span class="numero">04</span>
+            <h3>Google Search Console</h3>
+            <p>Dar de alta tu web y verificar que es tuya, paso a paso.</p>
+          </div>
+          <div class="tarjeta">
+            <span class="numero">05</span>
+            <h3>Pedir la indexación</h3>
+            <p>Avisar a Google de tu página y comprobar después su estado.</p>
+          </div>
+          <div class="tarjeta">
+            <span class="numero">06</span>
+            <h3>Errores frecuentes</h3>
+            <p>Saber qué significan los avisos más habituales y qué hacer con cada uno.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="contenedor dos-columnas">
+        <div>
+          <h2>Para quién es esta guía</h2>
+          <ul class="lista">
+            <li>Has creado tu web o tu landing con inteligencia artificial.</li>
+            <li>No sabes si está bien publicada ni si Google puede verla.</li>
+            <li>No programas y no quieres depender de nadie para lo básico.</li>
+            <li>Quieres entender lo que haces, no copiar códigos sin saber para qué sirven.</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Marketing sin humo</h2>
+          <div class="aviso">
+            <p>Nadie puede garantizarte el primer puesto en Google, y nosotras tampoco te lo vamos a prometer. Lo que sí te damos es un método claro para quitar obstáculos y hacerlo bien desde el principio.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fondo-suave cierre">
+      <div class="contenedor">
+        <h2>Deja de preguntarte si Google ve tu web</h2>
+        <p>Recibe la guía en tu correo, duplícala en tu Notion y síguela a tu ritmo, con fichas para rellenar y una checklist final.</p>
+        <a class="boton" href="#registro">Quiero la guía gratuita</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="contenedor">
+      <span>Somos Nexia · Marketing sin humo, ejecución sin rodeos.</span>
+      <span>
+        <!-- SUSTITUYE por las direcciones reales de vuestras páginas legales -->
+        <a href="https://somosnexia.com/aviso-legal/">Aviso legal</a> ·
+        <a href="https://somosnexia.com/politica-de-privacidad/">Política de privacidad</a>
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>
