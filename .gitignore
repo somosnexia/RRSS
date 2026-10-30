@@ -1,1 +1,12 @@
+# Python
 __pycache__/
+
+# Entorno Python que crea la skill de efectos en su primera ejecución
+.claude/skills/effects/.venv/
+
+# Vídeos de trabajo y exportados (pesados, no se versionan)
+exports/
+*.mp4
+*.mov
+*.MP4
+*.MOV
