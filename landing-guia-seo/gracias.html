@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gracias: revisa tu correo | Somos Nexia</title>
+  <!-- Página de agradecimiento: no debe aparecer en Google -->
+  <meta name="robots" content="noindex">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --azul: #2e4be2;
+      --azul-oscuro: #00367d;
+      --fondo-suave: #e9f6f5;
+      --texto: #111111;
+      --texto-suave: #4a4a4a;
+      --blanco: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Poppins", Arial, sans-serif;
+      color: var(--texto);
+      background: var(--fondo-suave);
+      line-height: 1.6;
+      font-size: 17px;
+      padding: 20px;
+    }
+
+    .caja {
+      max-width: 560px;
+      background: var(--blanco);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 54, 125, 0.10);
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.2;
+      margin: 0 0 16px;
+    }
+
+    p {
+      color: var(--texto-suave);
+      margin: 0 0 24px;
+    }
+
+    .boton {
+      display: inline-block;
+      background: var(--azul);
+      color: var(--blanco);
+      border-radius: 10px;
+      padding: 16px 32px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .boton:hover { background: var(--azul-oscuro); }
+
+    .nota {
+      font-size: 14px;
+      margin: 24px 0 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="caja">
+    <h1>¡Ya tienes tu guía!</h1>
+    <p>Gracias por registrarte. Ábrela aquí y, si quieres, duplícala en tu Notion para rellenar las fichas y las checklists.</p>
+    <a class="boton" href="https://vigorous-rock-272.notion.site/De-web-creada-con-IA-a-web-que-Google-puede-encontrar-gu-a-de-SEO-e-indexaci-n-de-inicio-3ffb4b4dc03c813ea4f5cc0031814a69" target="_blank" rel="noopener">Abrir la guía</a>
+    <!-- Borra esta frase si no has configurado en Brevo el email automático con el enlace -->
+    <p class="nota">También te hemos enviado el enlace a tu correo. Si no lo ves, mira en spam o en promociones.</p>
+  </div>
+</body>
+</html>
