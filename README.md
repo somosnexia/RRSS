@@ -10,6 +10,7 @@ Nuestro editor de reels con Claude, más piezas de contenido para redes.
 | `guiones/` | Guiones de texto para el subtitulador |
 | `fonts/` | Tipografía de los subtítulos (Montserrat ExtraBold) |
 | `.claude/skills/effects/` | Skill `/effects`: 45 efectos de vídeo que siguen la cara |
+| `reels_worker.py` | Motor del editor de reels del panel Nexia (lo ejecuta GitHub Actions desde `nexia-dashboard`) |
 | `landing-guia-seo/` | Landing de la guía SEO (versión HTML y bloque para WordPress con formulario de Brevo) |
 
 Los vídeos (`*.mp4`, `*.mov`) y la carpeta `exports/` no se versionan. Los brutos viven en Drive: `VIDEOS BRUTOS / 🤖 Cosas de IA`.
@@ -41,3 +42,12 @@ La primera vez Claude ejecuta `scripts/setup.sh`, que crea un entorno Python (`.
 Para que un efecto entre en una palabra concreta: `scripts/words.py <vídeo>` saca el segundo exacto de cada palabra.
 
 Los efectos solo añaden imagen. Los subtítulos se ponen con `subtitular.py`.
+
+## Editor de reels del panel (motor de render)
+
+`reels_worker.py` es el motor del editor de reels de app.somosnexia.com (Contenido → Editor de reels). No se ejecuta a mano: lo lanza el workflow `reels.yml` del repo `nexia-dashboard`.
+
+1. **Nueva** → descarga los brutos de Drive, los transcribe con Whisper y manda la transcripción al dashboard, que pide a Claude la propuesta de montaje, efectos y subtítulos.
+2. **En cola** → monta los tramos elegidos, añade los efectos de `/effects`, quema los subtítulos (Montserrat, palabras clave en magenta) y sube el reel a Drive, a «🎬 Reels editados».
+
+Solo habla con la API del dashboard (`/api/reels/worker`), que le da un token temporal de Drive. No imprime transcripciones ni tokens, porque los logs de Actions se pueden leer.
