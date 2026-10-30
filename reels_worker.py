@@ -135,7 +135,21 @@ def preparar(job, token, tmp):
 
 # ------------------------------------------------------------------ paso 2: render
 
+def ajustar_a_palabras(proyecto):
+    """Nunca cortar una palabra: si un tramo empieza o acaba a mitad de palabra, se abre hasta incluirla entera."""
+    for s in proyecto["segments"]:
+        b = proyecto["brutos"][s["bruto"]]
+        a, e = float(s["start"]), float(s["end"])
+        for w in b["words"]:
+            if w["s"] < a < w["e"] - 0.03:
+                a = w["s"] - 0.08
+            if w["s"] < e - 0.03 and w["e"] > e:
+                e = w["e"] + 0.15
+        s["start"], s["end"] = round(max(0.0, a), 3), round(min(float(b["duration"]), e), 3)
+
+
 def montar(proyecto, rutas, dst):
+    ajustar_a_palabras(proyecto)
     segs = [s for s in proyecto["segments"] if s.get("include", True)]
     if not segs:
         raise ValueError("El montaje no tiene ningún tramo activo")
