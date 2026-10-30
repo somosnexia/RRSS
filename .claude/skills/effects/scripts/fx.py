@@ -447,7 +447,7 @@ def comment_bar(c, e):
     if c.lt >= post_t:
         k = ease_back((c.lt - post_t) / 0.3)
         b = rrect(int(c.W * 0.52), int(bh * 0.85), bh * 0.3, (255, 255, 255, 240)); bd = ImageDraw.Draw(b)
-        bd.text((bh * 0.3, b.height * 0.32), 'you', font=font('ui', bh * 0.2), fill=(120, 120, 120, 255), anchor='lm')
+        bd.text((bh * 0.3, b.height * 0.32), 'tú', font=font('ui', bh * 0.2), fill=(120, 120, 120, 255), anchor='lm')
         bd.text((bh * 0.3, b.height * 0.66), word, font=font('ui', bh * 0.3), fill=INK + (255,), anchor='lm')
         hk = ease_back((c.lt - post_t - 0.3) / 0.3)
         if hk > 0:
@@ -822,7 +822,7 @@ def glass_widgets_v1(c, e):
     g = glass(c, bw, bh, bh * 0.28, bx, cy2, amt=0.14, dark=gd); d = ImageDraw.Draw(g)
     av = face_chip(c, e, bh * 0.62); g.alpha_composite(av, (int(bw - bh * 0.19 - av.width), int((bh - av.height) / 2)))
     d.text((bh * 0.2, bh * 0.36), e.o.get('name', 'Vibha'), font=font('uib', bh * 0.22), fill=(255, 255, 255, 255), anchor='lm')
-    d.text((bh * 0.2, bh * 0.66), e.o.get('handle', '@vibha.in.progress'), font=font('uim', bh * 0.14), fill=(255, 255, 255, 215), anchor='lm')
+    d.text((bh * 0.2, bh * 0.66), e.o.get('handle', '@somosnexia'), font=font('uim', bh * 0.14), fill=(255, 255, 255, 215), anchor='lm')
     place(c, g, bx, cy2, 0.6 + 0.4 * pop(c, 0.24), 0, al * clamp((c.lt - 0.24) / 0.1), behind=True)
     f1, f2 = font('uim', W * 0.045), font('uib', W * 0.045)
     pre, hi = e.o.get('pill', 'Edited by |Claude').split('|') if '|' in e.o.get('pill', 'Edited by |Claude') else (e.o['pill'], '')
@@ -909,7 +909,7 @@ def fx_pastel_word(c, e):
     card_ = rrect(cw, chh, chh * 0.3, (255, 255, 255, 248)); d = ImageDraw.Draw(card_)
     av = face_chip(c, e, chh * 0.64); card_.alpha_composite(av, (int(chh * 0.18), int((chh - av.height) / 2)))
     d.text((chh * 0.98, chh * 0.38), e.o.get('name', 'Vibha'), font=font('uib', chh * 0.22), fill=(20, 20, 22, 255), anchor='lm')
-    h1 = e.o.get('handle', '@vibha.in.progress  ·  '); f = font('uim', chh * 0.15)
+    h1 = e.o.get('handle', '@somosnexia  ·  '); f = font('uim', chh * 0.15)
     d.text((chh * 0.98, chh * 0.66), h1, font=f, fill=(140, 140, 150, 255), anchor='lm')
     d.text((chh * 0.98 + f.getlength(h1), chh * 0.66), e.o.get('role', 'creator'), font=f, fill=PURPLE + (255,), anchor='lm')
     at = e.d * 0.6; on = c.lt >= at
@@ -940,7 +940,7 @@ def fx_check_pills(c, e):
         d.text((bw * 0.19, bw * 0.1), title, font=font('uib', bw * 0.06), fill=(20, 20, 22, 255), anchor='lm')
         gr = thumb_grid(e.cards, 3, 3, int(bw * 0.28), int(bw * 0.025), i0=i * 3)
         im.alpha_composite(gr, ((bw - gr.width) // 2, int(bw * 0.2))); return shadowed(im, 16, 8, 70)
-    b1 = cached(e, 'b1', lambda: board(0, e.o.get('handle', '@vibha.in.progress')))
+    b1 = cached(e, 'b1', lambda: board(0, e.o.get('handle', '@somosnexia')))
     b2 = cached(e, 'b2', lambda: board(1, e.o.get('board', 'Reels  ·  22 effects')))
     by = max(H * 0.17, c.fy - c.fw * 0.9)
     place(c, b1, W * 0.25, by, 0.6 + 0.4 * pop(c, 0.0), 8, al * clamp(c.lt / 0.1), behind=True)
@@ -1041,7 +1041,7 @@ def fx_profile_wall(c, e):
     if swap < 1: d.text((cw / 2, chh * 0.33), f'{n:,}', font=font('uib', chh * 0.3), fill=(255, 255, 255, int(255 * (1 - swap))), anchor='mm')
     if swap > 0: d.text((cw / 2, chh * 0.33), e.o.get('label', 'views'), font=font('uib', chh * 0.3), fill=(255, 255, 255, int(255 * swap)), anchor='mm')
     av = face_chip(c, e, chh * 0.3); g.alpha_composite(av, (int(chh * 0.14), int(chh * 0.58)))
-    d.text((chh * 0.52, chh * 0.68), e.o.get('name', 'vibha.in.progress'), font=font('uib', chh * 0.09), fill=(255, 255, 255, 255), anchor='lm')
+    d.text((chh * 0.52, chh * 0.68), e.o.get('name', 'somosnexia'), font=font('uib', chh * 0.09), fill=(255, 255, 255, 255), anchor='lm')
     d.text((chh * 0.52, chh * 0.8), e.o.get('sub', 'top reel'), font=font('uim', chh * 0.075), fill=(170, 170, 176, 255), anchor='lm')
     on = c.lt >= e.d * 0.7
     d.rounded_rectangle([cw - chh * 0.95, chh * 0.62, cw - chh * 0.14, chh * 0.86], chh * 0.12, fill=((60, 60, 66, 255) if on else (255, 255, 255, 255)))
@@ -1200,7 +1200,7 @@ def fx_headline_wall(c, e):
         for j, ln in enumerate(lines): d.text((cw * 0.08, cw * 0.07 + j * lh), ln, font=f, fill=fg + (255,))
         my = chh - cw * 0.085; s = cw * 0.04
         d.polygon([(cw * 0.08, my - s / 2), (cw * 0.08, my + s / 2), (cw * 0.08 + s * 0.9, my)], fill=(255, 48, 64, 255))
-        d.text((cw * 0.08 + s * 1.5, my), ('@vibha.in.progress  ·  ' + meta) if meta else '@vibha.in.progress', font=font('uim', cw * 0.045), fill=fg + (170,), anchor='lm')
+        d.text((cw * 0.08 + s * 1.5, my), (e.o.get('handle', '@somosnexia') + '  ·  ' + meta) if meta else e.o.get('handle', '@somosnexia'), font=font('uim', cw * 0.045), fill=fg + (170,), anchor='lm')
         return shadowed(im, 14, 8, 110)
     N = int(e.o.get('count', 13))
     cards = cached(e, 'cards', lambda: [hcard(i) for i in range(N)])
@@ -1320,7 +1320,7 @@ def glass_widgets_v2(c, e):
     g = G(bw, bh, bx, cy3, bh * 0.28); d = ImageDraw.Draw(g)
     av = face_chip(c, e, bh * 0.62); g.alpha_composite(av, (int(bw - bh * 0.19 - av.width), int((bh - av.height) / 2)))
     d.text((bh * 0.2, bh * 0.36), e.o.get('name', 'Vibha'), font=font('uib', bh * 0.22), fill=white + (255,), anchor='lm')
-    d.text((bh * 0.2, bh * 0.66), e.o.get('handle', '@vibha.in.progress'), font=font('uim', bh * 0.14), fill=white + (215,), anchor='lm')
+    d.text((bh * 0.2, bh * 0.66), e.o.get('handle', '@somosnexia'), font=font('uim', bh * 0.14), fill=white + (215,), anchor='lm')
     show(g, bx, cy3, 2)
     # 4 · views artifact (a mini page inside the glass)
     aw, ah = 330 * u, 330 * u; dx, dy = 50 * u + aw / 2, ay + S / 2 + 26 * u + ah / 2
@@ -1412,28 +1412,28 @@ def comment_sheet(c, e):
     """Reels 1021 + VOX look: an Instagram Comments sheet above your head (your hair in front). The word types in, posts,
     gets a heart, then your reply drops in with a link chip."""
     W, H = c.W, c.H; u = W / 1080; al = fade(c, e)
-    word = e.o.get('text', 'EFFECTS'); handle = e.o.get('handle', 'vibha.in.progress')
-    reply = e.o.get('reply', 'Sent you the pack'); chip = e.o.get('chip', '22 effects')
+    word = e.o.get('text', 'EFFECTS'); handle = e.o.get('handle', 'somosnexia')
+    reply = e.o.get('reply', 'Te mando la guía'); chip = e.o.get('chip', 'Guía gratis')
     sw, sh = 740 * u, 450 * u
     t_post = 0.3 + 0.06 * len(word) + 0.1; t_heart, t_rep = t_post + 0.25, t_post + 0.4
     sheet = rrect(sw, sh, 30 * u, (38, 38, 40, 248)); d = ImageDraw.Draw(sheet)
     white, grey, blue = (245, 245, 245, 255), (160, 160, 166, 255), (0, 149, 246, 255)
     d.rounded_rectangle([sw / 2 - 32 * u, 14 * u, sw / 2 + 32 * u, 20 * u], 3 * u, fill=(110, 110, 116, 255))
-    d.text((sw / 2, 50 * u), 'Comments', font=font('uib', 26 * u), fill=white, anchor='mm')
+    d.text((sw / 2, 50 * u), 'Comentarios', font=font('uib', 26 * u), fill=white, anchor='mm')
     d.line([(0, 80 * u), (sw, 80 * u)], fill=(60, 60, 64, 255), width=max(1, int(2 * u)))
     def avatar(sz):
         a = Image.new('RGBA', (int(sz), int(sz)), (0, 0, 0, 0)); ad = ImageDraw.Draw(a)
-        ad.ellipse([0, 0, sz - 1, sz - 1], fill=(233, 90, 140, 255)); ad.text((sz / 2, sz / 2), 'V', font=font('uib', sz * 0.5), fill=(255, 255, 255, 255), anchor='mm')
+        ad.ellipse([0, 0, sz - 1, sz - 1], fill=(233, 90, 140, 255)); ad.text((sz / 2, sz / 2), handle.lstrip('@')[:1].upper(), font=font('uib', sz * 0.5), fill=(255, 255, 255, 255), anchor='mm')
         return a
     if c.lt < t_post:
-        d.text((sw / 2, 190 * u), 'Start the conversation.', font=font('uim', 21 * u), fill=grey, anchor='mm')
+        d.text((sw / 2, 190 * u), 'Empieza la conversación.', font=font('uim', 21 * u), fill=grey, anchor='mm')
     else:
         q = ease_out((c.lt - t_post) / 0.25); oy = (1 - q) * -20 * u; a8 = int(255 * clamp(q * 1.5))
         av = avatar(46 * u); av.putalpha(av.split()[3].point(lambda v: v * a8 // 255)); sheet.alpha_composite(av, (int(26 * u), int(100 * u + oy)))
-        d.text((88 * u, 108 * u + oy), 'you', font=font('uib', 19 * u), fill=white[:3] + (a8,), anchor='lm')
-        d.text((88 * u + font('uib', 19 * u).getlength('you ') + 4 * u, 108 * u + oy), 'now', font=font('uim', 18 * u), fill=grey[:3] + (a8,), anchor='lm')
+        d.text((88 * u, 108 * u + oy), 'tú', font=font('uib', 19 * u), fill=white[:3] + (a8,), anchor='lm')
+        d.text((88 * u + font('uib', 19 * u).getlength('tú ') + 4 * u, 108 * u + oy), 'ahora', font=font('uim', 18 * u), fill=grey[:3] + (a8,), anchor='lm')
         d.text((86 * u, 128 * u + oy), word, font=font('uib', 50 * u), fill=white[:3] + (a8,))
-        d.text((88 * u, 196 * u + oy), 'Reply', font=font('uim', 17 * u), fill=grey[:3] + (a8,), anchor='lm')
+        d.text((88 * u, 196 * u + oy), 'Responder', font=font('uim', 17 * u), fill=grey[:3] + (a8,), anchor='lm')
         hk = ease_back((c.lt - t_heart) / 0.3)
         if hk > 0:
             hh = heart(30 * u * hk, (255, 48, 64)); sheet.alpha_composite(hh, (int(sw - 46 * u - hh.width / 2), int(130 * u - hh.height / 2)))
@@ -1442,7 +1442,7 @@ def comment_sheet(c, e):
             ra = int(255 * clamp(rk * 1.5)); ry = 226 * u + (1 - rk) * 16 * u; rx = 88 * u
             fc = face_chip(c, e, 34 * u); fc.putalpha(fc.split()[3].point(lambda v: v * ra // 255)); sheet.alpha_composite(fc, (int(rx), int(ry)))
             d.text((rx + 46 * u, ry + 8 * u), handle, font=font('uib', 18 * u), fill=white[:3] + (ra,), anchor='lm')
-            d.text((rx + 46 * u + font('uib', 18 * u).getlength(handle) + 10 * u, ry + 8 * u), 'Author', font=font('uim', 16 * u), fill=grey[:3] + (ra,), anchor='lm')
+            d.text((rx + 46 * u + font('uib', 18 * u).getlength(handle) + 10 * u, ry + 8 * u), 'Autora', font=font('uim', 16 * u), fill=grey[:3] + (ra,), anchor='lm')
             d.text((rx + 46 * u, ry + 36 * u), reply, font=font('uim', 22 * u), fill=white[:3] + (ra,), anchor='lm')
             gift = emoji('🎁', 24 * u)
             if gift is not None:
@@ -1636,7 +1636,7 @@ def fx_apple_toggles(c, e):
         pad = max(10, W // 60) * 2 + W // 90
         return shadowed(im, max(10, W // 60), W // 90, 110), pad
     sh, pad = cached(e, 'base', base)
-    ts = [float(x) for x in e.o['ticks'].split('|')] if e.o.get('ticks') else [0.45 + 0.34 * i for i in range(len(rows))]
+    ts = [float(x) - e.start for x in e.o['ticks'].split('|')] if e.o.get('ticks') else [0.45 + 0.34 * i for i in range(len(rows))]
     im = sh.copy(); d = ImageDraw.Draw(im)
     off, on = np.float32((233, 233, 235)), np.float32(rgb(e.o.get('color'), (52, 199, 89)))
     for i in range(len(rows)):
