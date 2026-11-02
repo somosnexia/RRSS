@@ -1,6 +1,6 @@
 # Ficha · Somos Nexia
 
-> Información sacada de lo que hay en este repositorio (landing de la guía SEO, guion de reel, editor de reels y skill `/effects`). Lo que no aparece en el repo está marcado como **pendiente**.
+> Información del repositorio y del briefing de Somos Nexia (noviembre de 2026). Lo que no está confirmado está marcado como **pendiente**.
 
 ## Identidad
 
@@ -15,32 +15,42 @@
 | Razón social, dirección, teléfono, email público | **pendiente** (la landing tiene el hueco «[razón social]») |
 | Páginas legales | /aviso-legal/ · /politica-de-privacidad/ |
 
-## Qué hacen
+## Qué hacen (posicionamiento actual)
 
-Agencia de marketing y gestión para pequeños negocios. Según el guion de marca, se encargan de **lo que no se ve pero sostiene el negocio**:
+Equipo de mujeres especializado en marketing, ventas, automatización e implementación de sistemas inteligentes para negocios digitales. **Ya no** trabajan con Periscopio, asistentes virtuales ni delegación operativa genérica.
 
-- tareas, problemas, citas y reuniones
-- páginas web que no funcionan
-- correos sin contestar
-- lanzamientos con poca asistencia
-- contenido para redes (reels editados con IA desde su propio panel)
-- SEO e indexación de webs, sobre todo las creadas con IA
+**Servicio principal: Submarino NexIA** (https://submarino.somosnexia.com/). Es una infraestructura comercial inteligente que capta, atiende, conoce, cualifica, agenda y deriva oportunidades mediante agentes de IA entrenados para cada negocio, con supervisión humana.
 
-Promesa: *«dejamos que tú navegues mientras nosotras ordenamos el fondo»*. Que el cliente deje de cargar con todo (Atlas) y lidere con estrategia y un equipo que gestiona (Atenea).
+- Promesa: «Un sistema inteligente que capta, atiende y cualifica por y para ti».
+- Promesa emocional: «Deja de ser la esclava de tu propio éxito».
+- Frase eje: «No te faltan leads, te falta tiempo».
+- Posicionamiento: «No necesitas otro chatbot. Necesitas un sistema comercial inteligente».
+- Mensaje emocional: «Cuando tú eres el filtro de todo, también te conviertes en el límite».
+- Transformación: «De estar disponible siempre a tener un sistema siempre disponible».
 
-Servicios concretos, precios y paquetes: **pendiente**.
+| Servicio | Qué incluye | Implementación orientativa |
+|---|---|---|
+| **Radar NexIA** (gratuito) | Diagnóstico de captación y atención comercial; dice qué nivel necesita la clienta o si aún no está preparada | — |
+| **01 · Sónar NexIA** | Agente de atención en WhatsApp y redes, preguntas frecuentes, captación de datos, funnel, creatividades y formación | 30-45 días |
+| **02 · Reactor NexIA** | Todo Sónar + agente web, agente de voz, conexión de canales, calendario y reserva automática de citas | 45-60 días |
+| **03 · Puente de Mando NexIA** | Todo Reactor + agente setter, seguimiento hasta la llamada cualificada y 12 vídeos con avatar IA | 45-60 días |
+| **04 · Astillero NexIA** | A medida: agentes especializados, integraciones, CRM, automatizaciones avanzadas, paneles y desarrollos por fases | Según proyecto |
+| **Sala de Máquinas** | Soporte, mantenimiento, ajustes, alojamiento y optimización continua | Continuo |
+
+Los cuatro niveles son soluciones distintas según el negocio, **no fases obligatorias**. Precios: **pendiente** (no se publican sin confirmar).
 
 ## Público objetivo
 
-- Emprendedoras y dueños de pequeños negocios que hacen malabares con clientes, tareas, lanzamientos y vida personal.
-- Gente que cree que delegar es rendirse y lo lleva todo sola.
-- Personas que han creado su web o landing con IA, no programan y quieren entender lo que hacen sin depender de nadie para lo básico.
+- Mentoras de negocio y empresarias digitales con oferta validada (servicios, programas, mentorías o productos de alto valor).
+- Preferentemente con facturación superior a 7.000 €/mes y volumen de consultas suficiente.
+- España como mercado prioritario; Latinoamérica, secundario.
+- Dolores: responder lo mismo una y otra vez, mirar WhatsApp fuera de horario, perder oportunidades por responder tarde, llamadas con gente que no encaja, seguimiento manual, contactos repartidos entre canales, sentir que desconectar es dejar de vender.
 
 ## Posicionamiento y tono
 
 - **Sin humo:** no prometen lo imposible. Ejemplo: «Nadie puede garantizarte el primer puesto en Google, y nosotras tampoco te lo vamos a prometer».
 - **Claridad:** método paso a paso, sin jerga ni tecnicismos, con checklists y plantillas.
-- **Cercano:** tutea, habla en primera persona del plural femenino, usa humor y narrativa (mitología griega: Atlas, Ulises, Poseidón, Atenea).
+- **Cercano y con punto canalla:** español de España, tutea, habla en femenino plural, humor con intención, ironía y verdades incómodas. Universo visual de submarinos, sónar, radares y salas de control.
 - **Práctico:** el foco está en ejecutar, no en teorizar.
 
 ## Recursos y lead magnets
@@ -78,7 +88,7 @@ Notion · Brevo · WordPress · Google Search Console · Google Drive · GitHub 
 
 ## Pendiente de completar
 
-- Servicios con precios y paquetes
+- Precios de cada nivel
 - Nombres y roles del equipo
 - Datos legales y de contacto (razón social, email, teléfono, ubicación)
 - Otras redes (LinkedIn, TikTok…)
