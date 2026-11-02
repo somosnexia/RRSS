@@ -204,27 +204,54 @@ def palabras_montaje(proyecto, segs):
     return out
 
 
+# Errores típicos de la transcripción automática. Las correcciones del proyecto mandan sobre estas.
+# Las claves pueden ser varias palabras ("cap cut"): se funden en una sola.
+FIXES_BASE = {"clon": "Claude", "clod": "Claude", "cloud": "Claude", "claudio": "Claude", "cloe": "Claude", "clot": "Claude",
+              "clau": "Claude", "cloude": "Claude", "cap cut": "CapCut", "cinco cut": "CapCut", "cinco up cut": "CapCut",
+              "capcat": "CapCut", "chat gpt": "ChatGPT", "chat jpt": "ChatGPT", "many chat": "ManyChat", "nexia": "Nexia"}
+MAX_PALABRAS, MAX_CARACTERES = 3, 18  # líneas cortas: no tocan los bordes y no se descompensan con el resalte
+
+
+def _limpia(t):
+    return t.lower().strip("¿?¡!.,")
+
+
+def corregir(palabras, fixes):
+    fixes = {**FIXES_BASE, **{" ".join(_limpia(x) for x in k.split()): v for k, v in fixes.items()}}
+    claves = sorted(fixes, key=lambda k: -len(k.split()))
+    out, i = [], 0
+    while i < len(palabras):
+        hecho = False
+        for k in claves:
+            n = len(k.split())
+            trozo = palabras[i:i + n]
+            if len(trozo) == n and " ".join(_limpia(w["w"]) for w in trozo) == k:
+                nuevo = fixes[k]
+                if nuevo:
+                    pre = re.match(r"^[¿¡]*", trozo[0]["w"].strip()).group(0)
+                    post = re.search(r"[\.,\?!]*$", trozo[-1]["w"].strip()).group(0)
+                    out.append({"w": pre + nuevo + post, "s": trozo[0]["s"], "e": trozo[-1]["e"]})
+                i += n
+                hecho = True
+                break
+        if not hecho:
+            out.append(dict(palabras[i], w=palabras[i]["w"].strip()))
+            i += 1
+    return out
+
+
 def subtitulos(proyecto, palabras, plan, dst):
     cfg = proyecto.get("subtitles", {})
-    fixes = {k.lower(): v for k, v in (cfg.get("fixes") or {}).items()}
-    destacar = {x.lower().strip("¿?¡!.,") for x in cfg.get("highlight") or []}
+    destacar = {_limpia(x) for x in cfg.get("highlight") or []}
     ocultar = [(e["start"], e["end"]) for e in plan if e["fx"] in OCULTA_SUBS]
-    limpias = []
-    for w in palabras:
-        base = w["w"].strip()
-        clave = base.lower().strip("¿?¡!.,")
-        if clave in fixes:
-            nuevo = fixes[clave]
-            if not nuevo:
-                continue
-            pre = re.match(r"^[¿¡]*", base).group(0)
-            post = re.search(r"[\.,\?!]*$", base).group(0)
-            base = pre + nuevo + post
-        limpias.append(dict(w, w=base))
+    limpias = corregir(palabras, cfg.get("fixes") or {})
     trozos, cur = [], []
     for w in limpias:
+        if cur and len(" ".join(x["w"] for x in cur + [w])) > MAX_CARACTERES:
+            trozos.append(cur)
+            cur = []
         cur.append(w)
-        if len(cur) >= 4 or len(" ".join(x["w"] for x in cur)) >= 20 or re.search(r"[\.\?!,]$", w["w"]):
+        if len(cur) >= MAX_PALABRAS or re.search(r"[\.\?!,]$", w["w"]):
             trozos.append(cur)
             cur = []
     if cur:
@@ -243,10 +270,10 @@ def subtitulos(proyecto, palabras, plan, dst):
         partes = []
         for x in c:
             t = x["w"].upper().replace("{", "(").replace("}", ")")
-            limpia = x["w"].lower().strip("¿?¡!.,")
+            limpia = _limpia(x["w"])
             partes.append("{\\c" + MAGENTA_ASS + "}" + t + "{\\c&HFFFFFF&}" if limpia in destacar else t)
         lineas.append(f"Dialogue: 0,{ts(a)},{ts(b)},Main,,0,0,0,,"
-                      r"{\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}" + " ".join(partes))
+                      r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}" + " ".join(partes))
     cab = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
