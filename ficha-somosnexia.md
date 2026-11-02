@@ -9,10 +9,11 @@
 | Nombre | Somos Nexia (marca corta: **Nexia**; en cabecera: «SOMOS NEXIA») |
 | Web | https://somosnexia.com |
 | Panel / app | https://app.somosnexia.com (panel Nexia: Contenido → Editor de reels) |
-| Redes | @somosnexia (Instagram y firma de los vídeos) |
+| Redes | @somosnexia en Instagram (también firma de los vídeos). La landing enlaza además a X, Facebook, LinkedIn y YouTube |
 | Lema | **«Marketing sin humo, ejecución sin rodeos.»** |
 | Equipo | Habla en femenino plural («nosotras»): equipo de mujeres. Nombres: **pendiente** |
-| Razón social, dirección, teléfono, email público | **pendiente** (la landing tiene el hueco «[razón social]») |
+| Email | info@somosnexia.com |
+| Razón social, dirección, teléfono | **pendiente** (la landing de la guía SEO tiene el hueco «[razón social]») |
 | Páginas legales | /aviso-legal/ · /politica-de-privacidad/ |
 
 ## Qué hacen (posicionamiento actual)
@@ -36,6 +37,16 @@ Equipo de mujeres especializado en marketing, ventas, automatización e implemen
 | **03 · Puente de Mando NexIA** | Todo Reactor + agente setter, seguimiento hasta la llamada cualificada y 12 vídeos con avatar IA | 45-60 días |
 | **04 · Astillero NexIA** | A medida: agentes especializados, integraciones, CRM, automatizaciones avanzadas, paneles y desarrollos por fases | Según proyecto |
 | **Sala de Máquinas** | Soporte, mantenimiento, ajustes, alojamiento y optimización continua | Continuo |
+
+Cómo lo presenta la landing:
+
+- Subtítulos de los niveles: Sónar, «Detecta y atiende oportunidades»; Reactor, «Activa la atención en varios canales»; Puente de Mando, «Coordina cualificación y seguimiento»; Astillero, «Una solución construida a medida» (implementación: a consultar).
+- Recorrido del lead: Capta → Atiende → Conoce → Cualifica → Agenda → Deriva.
+- Método llave en mano: Inmersión → Arquitectura → Construcción → Conexión → Pruebas → Lanzamiento → Soporte.
+- Radar NexIA: «No adivines. Escanea.»
+- Objeción principal: «Pero nadie atiende como yo». Respuesta: «Si no sabe, no inventa».
+- Botones: «Quiero mi diagnóstico», «Activar Radar NexIA», «Reserva tu demo» y «Hablar con el equipo».
+- Pie: «La línea de automatización avanzada y agentes de IA dentro de la Liberación Operativa de Somos Nexia».
 
 Los cuatro niveles son soluciones distintas según el negocio, **no fases obligatorias**. Precios: **pendiente** (no se publican sin confirmar).
 
