@@ -31,7 +31,7 @@ Equipo de mujeres especializado en marketing, ventas, automatización e implemen
 
 | Servicio | Qué incluye | Implementación orientativa |
 |---|---|---|
-| **Radar NexIA** (gratuito) | Diagnóstico de captación y atención comercial; dice qué nivel necesita la clienta o si aún no está preparada | — |
+| **Radar NexIA** (gratuito) | Diagnóstico online en radar.submarino.somosnexia.com: 12 preguntas, una por pantalla, menos de 15 minutos, sin compromiso y sin conocimientos técnicos. Analiza captación, atención, cualificación, seguimiento y agenda (responde → analiza → recomienda) y dice qué nivel necesita la clienta o si aún no está lista | — |
 | **01 · Sónar NexIA** | Agente de atención en WhatsApp y redes, preguntas frecuentes, captación de datos, funnel, creatividades y formación | 30-45 días |
 | **02 · Reactor NexIA** | Todo Sónar + agente web, agente de voz, conexión de canales, calendario y reserva automática de citas | 45-60 días |
 | **03 · Puente de Mando NexIA** | Todo Reactor + agente setter, seguimiento hasta la llamada cualificada y 12 vídeos con avatar IA | 45-60 días |
@@ -45,6 +45,7 @@ Cómo lo presenta la landing:
 - Método llave en mano: Inmersión → Arquitectura → Construcción → Conexión → Pruebas → Lanzamiento → Soporte.
 - Radar NexIA: «No adivines. Escanea.»
 - Objeción principal: «Pero nadie atiende como yo». Respuesta: «Si no sabe, no inventa».
+- Radar, «Es para ti si…»: eres mentora, coach o asesora de negocios; ya tienes una oferta validada y recibes consultas; repites respuestas o tareas comerciales cada semana; quieres usar IA partiendo de un problema real. «No es para ti si…»: todavía no tienes clara tu oferta; no recibes contactos regularmente; no existe todavía ni un proceso manual; no quieres compartir información sobre tu operativa.
 - Botones: «Quiero mi diagnóstico», «Activar Radar NexIA», «Reserva tu demo» y «Hablar con el equipo».
 - Pie: «La línea de automatización avanzada y agentes de IA dentro de la Liberación Operativa de Somos Nexia».
 
