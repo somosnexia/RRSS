@@ -200,4 +200,28 @@ La landing no se rehace. Estos son ajustes puntuales para que el embudo conviert
 
 ---
 
+# 7. Creatividades en Canva
+
+Carpeta: **Instafunnel · Submarino NexIA** (https://www.canva.com/folder/FAHZzYo80Qc). Hechas con el brand kit Somos Nexia. Los textos son editables.
+
+| Diseño en Canva | Pieza del embudo | Formato | Págs. |
+|---|---|---|---|
+| IF Fijado 1 · Portada Reel · Quiénes somos | Post fijado 1 | 9:16 | 1 |
+| IF Fijado 2 · Carrusel · Cómo funciona | Post fijado 2 | 4:5 | 9 |
+| IF Fijado 3 · Carrusel · ¿Lo necesito? | Post fijado 3 | 4:5 | 8 |
+| IF Follow Me Ads · 9:16 | FMA 1-4 | 9:16 | 4 |
+| IF Anuncios retargeting · 9:16 | RT1, RT2, RT4 y variante «Radar sin terminar» | 9:16 | 4 |
+| IF RT3 · Carrusel · Implementación | RT3 | 4:5 | 5 |
+| IF Portadas de Reels · 9:16 | Reels 1.1, 1.2, 2.1, 2.3, 3.1, 3.3, 4.2, 5.1 | 9:16 | 8 |
+| IF 1.3 · Carrusel · Las 6 frases | 1.3 | 4:5 | 8 |
+| IF 2.2 · Carrusel · Lo que NO hacen | 2.2 | 4:5 | 7 |
+| IF 3.2 · Carrusel · Haz la cuenta | 3.2 | 4:5 | 6 |
+| IF 4.3 · Carrusel · Niveles, no fases | 4.3 | 4:5 | 7 |
+| IF 5.3 · Carrusel · Toca ampliar | 5.3 | 4:5 | 6 |
+| IF Stories · Radar NexIA y Sala de Máquinas | Secuencia 4.1 (7 stories) + 5.2 | 9:16 | 8 |
+
+Plantillas para piezas nuevas (campos de autorrelleno: título, texto, botón, etiqueta): «Plantilla IF · Carrusel con imagen», «Plantilla IF · Carrusel texto» y «Plantilla IF · Vertical 9:16».
+
+---
+
 *Marketing sin humo. Ejecución sin rodeos.*
