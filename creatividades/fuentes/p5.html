@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:F1;src:url(../fonts/f1.ttf)}@font-face{font-family:F2;src:url(../fonts/f2.ttf)}
+@font-face{font-family:F3;src:url(../fonts/f3.ttf)}@font-face{font-family:F4;src:url(../fonts/f6.ttf)}
+@font-face{font-family:F5;src:url(../fonts/f4.ttf)}@font-face{font-family:F6;src:url(../fonts/f8.ttf)}
+@font-face{font-family:F7;src:url(../fonts/f9.ttf)}@font-face{font-family:F8;src:url(../fonts/Poppins-800.ttf)}
+@font-face{font-family:P6;src:url(../fonts/Poppins-600.ttf)}
+html,body{margin:0}
+.c{width:1080px;height:1350px;position:relative;overflow:hidden;background:#c9a77c}
+.paper{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,#d8b98f,#b98f60 90%)}
+.noise{position:absolute;inset:0;opacity:.35;mix-blend-mode:multiply}
+.note{position:absolute;left:70px;right:70px;top:120px;display:flex;flex-wrap:wrap;gap:16px 26px;align-items:center}
+.w{display:flex;gap:3px}
+.ch{display:inline-block;padding:4px 8px 2px;line-height:1;box-shadow:2px 3px 4px rgba(0,0,0,.35)}
+.sig{position:absolute;right:80px;top:960px;font-family:F7;font-size:40px;color:#1a1a1a;transform:rotate(-4deg)}
+.tape{position:absolute;width:160px;height:46px;background:rgba(255,255,240,.55);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.bar{position:absolute;left:0;right:0;bottom:0;height:150px;background:#0e1628;display:flex;align-items:center;justify-content:space-between;padding:0 64px;box-sizing:border-box;font-family:P6;color:#fff;font-size:27px}
+.bar b{color:#8fb0ff}
+</style></head><body><div class="c"><div class="paper"></div>
+<svg class="noise" width="1080" height="1350"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="4"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+<div class="tape" style="left:60px;top:40px;transform:rotate(-8deg)"></div><div class="tape" style="right:60px;top:44px;transform:rotate(7deg)"></div>
+<div class="note" id="note"></div>
+<div style="position:absolute;left:90px;top:800px;width:290px;padding:16px 16px 60px;background:#f7f5f0;box-shadow:4px 8px 18px rgba(0,0,0,.4);transform:rotate(-6deg)">
+<div style="width:290px;height:290px;overflow:hidden;background:#222"><img src="1.jpg" style="width:290px;margin-top:-40px;filter:grayscale(1) contrast(1.2) brightness(.9)"></div>
+<div style="position:absolute;bottom:14px;left:18px;font-family:F7;font-size:24px;color:#333">prueba de vida · 23:47</div></div>
+<div class="tape" style="left:170px;top:778px;width:120px;height:38px;transform:rotate(-10deg)"></div>
+<div class="sig">Atte., tu WhatsApp</div>
+<div class="bar"><span>Rescate disponible: <b>Radar NexIA</b></span><span>@somosnexia</span></div>
+</div>
+<script>
+let seed=7;const R=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const fonts=['F1','F2','F3','F4','F5','F6','F7','F8'];
+const styles=[['#fff','#111'],['#f4ecd2','#111'],['#111','#fff'],['#e0206e','#fff'],['#2e4be2','#fff'],['#fff','#e0206e'],['#ffe65c','#111'],['#e9e4da','#2e4be2']];
+const text="ENTREGA 3 HORAS AL DÍA O NO VUELVES A VER TUS VACACIONES.";
+const n=document.getElementById("note");
+text.split(' ').forEach(word=>{const w=document.createElement('span');w.className='w';
+ [...word].forEach(c=>{const s=document.createElement('span');s.className='ch';s.textContent=c;
+  const st=styles[Math.floor(R()*styles.length)];const f=fonts[Math.floor(R()*fonts.length)];
+  s.style.background=st[0];s.style.color=st[1];s.style.fontFamily=f;
+  s.style.fontSize=(f==='F2'?104:f==='F6'?66:84)+Math.floor(R()*14)+'px';
+  s.style.transform=`rotate(${(R()*14-7).toFixed(1)}deg) translateY(${(R()*10-5).toFixed(0)}px)`;
+  w.appendChild(s)});n.appendChild(w)});
+</script></body></html>
