@@ -1,0 +1,60 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:P;src:url(../fonts/Poppins-800.ttf);font-weight:800}
+@font-face{font-family:P;src:url(../fonts/Poppins-600.ttf);font-weight:600}
+@font-face{font-family:PF;src:url(../fonts/f5.ttf);font-style:italic}
+@font-face{font-family:M;src:url(../fonts/f3.ttf)}
+html,body{margin:0}
+.c{width:1080px;height:1350px;position:relative;overflow:hidden;background:#0e1628}
+.ph{position:absolute;inset:0;width:1080px;height:1350px;filter:saturate(.92) contrast(1.04) brightness(1.03)}
+.tint{position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,22,40,.55),rgba(14,22,40,0) 45%),#1b3a8a;mix-blend-mode:soft-light;opacity:.42}
+.fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,32,0) 60%,rgba(10,16,32,.9) 82%,rgba(10,16,32,.97))}
+svg.hud{position:absolute;inset:0;mix-blend-mode:screen}
+.h{position:absolute;left:64px;right:64px;bottom:120px;color:#fff;font-family:P;font-weight:800;font-size:72px;line-height:.98;letter-spacing:-1.5px;text-transform:uppercase}
+.h em{display:block;font-family:PF;font-style:italic;font-weight:700;text-transform:none;color:#9cc0ff;font-size:76px;letter-spacing:0;margin-top:8px}
+.foot{position:absolute;left:64px;right:64px;bottom:46px;display:flex;justify-content:space-between;font-family:P;font-weight:600;color:#dfe6ff;font-size:23px}
+.brand{position:absolute;left:64px;top:60px;font-family:P;font-weight:800;color:#fff;font-size:24px;letter-spacing:3px}
+.brand b{color:#9cc0ff}
+</style></head><body><div class="c">
+<img class="ph" src="yo_crop.jpg"><div class="tint"></div>
+<svg class="hud" width="1080" height="1350" viewBox="0 0 1080 1350"><g transform="translate(3,37)">
+ <defs><radialGradient id="g" cx="641" cy="480" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#8fc8ff" stop-opacity=".55"/><stop offset="1" stop-color="#8fc8ff" stop-opacity="0"/></radialGradient></defs>
+ <circle cx="641" cy="480" r="120" fill="url(#g)"/>
+ <g fill="none" stroke="#e8f1ff">
+  <circle cx="641" cy="480" r="78" stroke-width="2" opacity=".7"/>
+  <circle cx="641" cy="480" r="150" stroke-width="1.2" opacity=".5"/>
+  <circle cx="641" cy="480" r="168" stroke-width="10" opacity=".22" stroke-dasharray="210 30 60 30 120 40"/>
+  <circle cx="641" cy="480" r="200" stroke-width="1" opacity=".45" stroke-dasharray="2 9"/>
+  <path d="M641 230 A250 250 0 0 1 891 480" stroke-width="3" opacity=".8"/>
+  <path d="M641 230 A250 250 0 0 0 391 480" stroke-width="1.2" opacity=".4"/>
+  <path d="M520 742 A280 280 0 0 1 361 480" stroke-width="16" opacity=".16"/>
+  <circle cx="641" cy="480" r="330" stroke-width="1.2" opacity=".35"/>
+  <path d="M900 260 A340 340 0 0 1 975 500" stroke-width="22" opacity=".14"/>
+  <circle cx="641" cy="480" r="420" stroke-width="1" opacity=".25" stroke-dasharray="1 14"/>
+ </g>
+ <g stroke="#e8f1ff" opacity=".6" id="tk"></g>
+ <g fill="#e8f1ff">
+  <circle cx="872" cy="372" r="14" opacity=".55"/><circle cx="905" cy="430" r="11" opacity=".45"/><circle cx="918" cy="492" r="9" opacity=".4"/>
+  <circle cx="641" cy="230" r="5" opacity=".9"/><circle cx="891" cy="480" r="5" opacity=".9"/>
+ </g>
+ <g stroke="#e8f1ff" stroke-width="1" opacity=".35" fill="none">
+  <path d="M60 300 L230 360 L180 520 L320 610"/><path d="M230 360 L360 300"/><path d="M180 520 L80 640"/>
+ </g>
+ <g fill="#e8f1ff" opacity=".6"><circle cx="230" cy="360" r="4"/><circle cx="180" cy="520" r="4"/><circle cx="320" cy="610" r="4"/><circle cx="360" cy="300" r="3"/><circle cx="80" cy="640" r="3"/></g>
+ <g font-family="M" font-size="17" fill="#e8f1ff" letter-spacing="2" opacity=".85">
+  <text x="905" y="240">SÓNAR 360°</text><text x="905" y="262" opacity=".7">ESCANEANDO…</text>
+  <text x="930" y="560">LEADS · 37</text><text x="930" y="582" opacity=".7">RESP. &lt; 5 S</text>
+  <text x="64" y="700">RADAR · ON</text>
+ </g>
+</g></svg>
+<div class="fade"></div>
+<div class="brand">SOMOS <b>NEXIA</b></div>
+<div class="h">Vemos lo que tu WhatsApp<em>no te enseña.</em></div>
+<div class="foot"><span>Submarino NexIA</span><span>@somosnexia</span></div>
+<script>
+const g=document.getElementById('tk');const cx=641,cy=480;
+for(let i=0;i<72;i++){const a=i*5*Math.PI/180;const r1=226,r2=i%6==0?244:234;
+ const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+ l.setAttribute('x1',cx+r1*Math.cos(a));l.setAttribute('y1',cy+r1*Math.sin(a));l.setAttribute('x2',cx+r2*Math.cos(a));l.setAttribute('y2',cy+r2*Math.sin(a));
+ l.setAttribute('stroke-width',i%6==0?2:1);g.appendChild(l)}
+</script>
+</div></body></html>
