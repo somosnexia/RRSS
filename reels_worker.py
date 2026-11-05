@@ -104,6 +104,20 @@ def duracion(path):
     return float(out.strip())
 
 
+def fotogramas(path, dur, n=6):
+    """n fotogramas pequeños (JPEG en base64) repartidos por el vídeo, para que el dashboard detecte subtítulos ya quemados."""
+    import base64
+    out = []
+    for k in range(n):
+        t = max(0.0, dur * (k + 0.5) / n)
+        r = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{t:.2f}", "-i", path, "-frames:v", "1",
+                            "-vf", "scale=360:-2", "-q:v", "6", "-f", "image2pipe", "-vcodec", "mjpeg", "-"],
+                           capture_output=True)
+        if r.returncode == 0 and r.stdout:
+            out.append(base64.b64encode(r.stdout).decode())
+    return out
+
+
 _modelo = None
 
 
@@ -125,12 +139,16 @@ def transcribir(path):
 
 def preparar(job, token, tmp):
     update(job["id"], estado="Transcribiendo", error="")
-    brutos = []
+    brutos, frames = [], []
     for i, fid in enumerate(job["brutos"]):
         src = drive_download(token, fid, os.path.join(tmp, f"b{i}.mp4"))
         brutos.append({"id": fid, "duration": round(duracion(src), 2), "words": transcribir(src)})
+        try:
+            frames.append(fotogramas(src, brutos[-1]["duration"]))
+        except Exception:
+            frames.append([])
         print(f"  bruto {i + 1}/{len(job['brutos'])}: {brutos[-1]['duration']} s, {len(brutos[-1]['words'])} palabras")
-    api("POST", "/api/reels/worker", {"action": "propose", "id": job["id"], "brutos": brutos})
+    api("POST", "/api/reels/worker", {"action": "propose", "id": job["id"], "brutos": brutos, "frames": frames})
 
 
 # ------------------------------------------------------------------ paso 2: render
