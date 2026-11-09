@@ -104,6 +104,13 @@ def duracion(path):
     return float(out.strip())
 
 
+def tiene_audio(path):
+    """Las grabaciones de pantalla suelen venir sin pista de audio: ni se transcriben ni se pueden pasar por [i:a]."""
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", path],
+                         check=True, capture_output=True, text=True).stdout
+    return bool(out.strip())
+
+
 def fotogramas(path, dur, n=6):
     """n fotogramas pequeños (JPEG en base64) repartidos por el vídeo, para que el dashboard detecte subtítulos ya quemados."""
     import base64
@@ -126,6 +133,8 @@ def transcribir(path):
     from faster_whisper import WhisperModel
     if _modelo is None:
         _modelo = WhisperModel(os.environ.get("WHISPER_MODEL", "small"), device="cpu", compute_type="int8")
+    if not tiene_audio(path):
+        return []  # vídeo sin sonido (p. ej. grabación de pantalla): no hay nada que transcribir
     # El audio se saca con ffmpeg (16 kHz mono) y no con PyAV: faster-whisper choca con algunas versiones de av.
     import numpy as np
     pcm = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", path, "-vn", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
@@ -171,12 +180,15 @@ def montar(proyecto, rutas, dst):
     segs = [s for s in proyecto["segments"] if s.get("include", True)]
     if not segs:
         raise ValueError("El montaje no tiene ningún tramo activo")
-    ins, fc = [], []
+    ins, fc, sonido = [], [], {}
     for i, s in enumerate(segs):
         a, b = float(s["start"]), float(s["end"])
         ins += ["-ss", f"{a:.3f}", "-t", f"{b - a:.3f}", "-i", rutas[s["bruto"]]]
-        fc.append(f"[{i}:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setsar=1,setpts=PTS-STARTPTS[v{i}];"
-                  f"[{i}:a]aresample=48000,afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,asetpts=PTS-STARTPTS[a{i}]")
+        if sonido.setdefault(s["bruto"], tiene_audio(rutas[s["bruto"]])):
+            audio = f"[{i}:a]aresample=48000,afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,asetpts=PTS-STARTPTS[a{i}]"
+        else:  # bruto sin audio: silencio de la misma duración para que el concat no falle
+            audio = f"anullsrc=r=48000:cl=stereo:d={b - a:.3f},asetpts=PTS-STARTPTS[a{i}]"
+        fc.append(f"[{i}:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setsar=1,setpts=PTS-STARTPTS[v{i}];" + audio)
     n = len(segs)
     fc.append("".join(f"[v{i}][a{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=1[v][a0];[a0]loudnorm=I=-14:TP=-1.5[a]")
     run(["ffmpeg", "-loglevel", "error", "-y", *ins, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
