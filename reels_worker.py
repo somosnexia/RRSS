@@ -148,15 +148,24 @@ def transcribir(path):
 
 def preparar(job, token, tmp):
     update(job["id"], estado="Transcribiendo", error="")
-    brutos, frames = [], []
+    brutos, frames, omitidos = [], [], []
     for i, fid in enumerate(job["brutos"]):
         src = drive_download(token, fid, os.path.join(tmp, f"b{i}.mp4"))
-        brutos.append({"id": fid, "duration": round(duracion(src), 2), "words": transcribir(src)})
+        try:
+            dur = round(duracion(src), 2)
+        except subprocess.CalledProcessError:
+            # Subida vacía o corrupta en Drive: se salta ese bruto y el resto sigue adelante.
+            print(f"  bruto {i + 1}/{len(job['brutos'])} ({fid}): archivo vacío o ilegible ({os.path.getsize(src)} bytes), se omite")
+            omitidos.append(fid)
+            continue
+        brutos.append({"id": fid, "duration": dur, "words": transcribir(src)})
         try:
             frames.append(fotogramas(src, brutos[-1]["duration"]))
         except Exception:
             frames.append([])
         print(f"  bruto {i + 1}/{len(job['brutos'])}: {brutos[-1]['duration']} s, {len(brutos[-1]['words'])} palabras")
+    if not brutos:
+        raise ValueError("Ningún vídeo en bruto se puede leer (archivos vacíos o dañados en Drive). Vuelve a subirlos.")
     api("POST", "/api/reels/worker", {"action": "propose", "id": job["id"], "brutos": brutos, "frames": frames})
 
 
