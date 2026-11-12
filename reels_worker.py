@@ -111,6 +111,17 @@ def tiene_audio(path):
     return bool(out.strip())
 
 
+def verde_de_fondo(path):
+    """Color del fondo si el bruto está grabado sobre pantalla verde (se mira una esquina del primer fotograma); si no, None."""
+    try:
+        px = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-frames:v", "1", "-vf", "crop=2:2:24:24,scale=1:1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                            check=True, capture_output=True).stdout
+        r, g, b = px[0], px[1], px[2]
+    except Exception:
+        return None
+    return f"0x{r:02X}{g:02X}{b:02X}" if g > r + 40 and g > b + 40 else None
+
+
 def fotogramas(path, dur, n=6):
     """n fotogramas pequeños (JPEG en base64) repartidos por el vídeo, para que el dashboard detecte subtítulos ya quemados."""
     import base64
@@ -190,6 +201,14 @@ def montar(proyecto, rutas, dst):
     if not segs:
         raise ValueError("El montaje no tiene ningún tramo activo")
     ins, fc, sonido = [], [], {}
+    # Fondo opcional: {"mode": "color", "color": "#RRGGBB"}. Solo se aplica a los brutos grabados sobre verde.
+    cfg = proyecto.get("background") or {}
+    fondo = None
+    if cfg.get("mode") == "color" and re.fullmatch(r"#[0-9A-Fa-f]{6}", str(cfg.get("color", ""))):
+        fondo = "0x" + cfg["color"][1:].upper()
+    claves = {b: verde_de_fondo(rutas[b]) for b in {s["bruto"] for s in segs}} if fondo else {}
+    if fondo:
+        print("  fondo:", cfg["color"], "· brutos con pantalla verde:", [b for b, c in claves.items() if c] or "ninguno")
     for i, s in enumerate(segs):
         a, b = float(s["start"]), float(s["end"])
         ins += ["-ss", f"{a:.3f}", "-t", f"{b - a:.3f}", "-i", rutas[s["bruto"]]]
@@ -197,7 +216,13 @@ def montar(proyecto, rutas, dst):
             audio = f"[{i}:a]aresample=48000,afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,asetpts=PTS-STARTPTS[a{i}]"
         else:  # bruto sin audio: silencio de la misma duración para que el concat no falle
             audio = f"anullsrc=r=48000:cl=stereo:d={b - a:.3f},asetpts=PTS-STARTPTS[a{i}]"
-        fc.append(f"[{i}:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setsar=1,setpts=PTS-STARTPTS[v{i}];" + audio)
+        base = f"[{i}:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setsar=1,setpts=PTS-STARTPTS"
+        clave = claves.get(s["bruto"])
+        if fondo and clave:  # sustituye la pantalla verde por el color elegido (el desvío de verde limpia los bordes)
+            fc.append(f"{base},chromakey={clave}:0.12:0.06,despill=type=green:mix=0.5:expand=0,format=yuva420p[k{i}];"
+                      f"color=c={fondo}:s={W}x{H}:r={FPS}:d={b - a:.3f}[bg{i}];[bg{i}][k{i}]overlay=shortest=1,format=yuv420p,setpts=PTS-STARTPTS[v{i}];" + audio)
+        else:
+            fc.append(f"{base}[v{i}];" + audio)
     n = len(segs)
     fc.append("".join(f"[v{i}][a{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=1[v][a0];[a0]loudnorm=I=-14:TP=-1.5[a]")
     run(["ffmpeg", "-loglevel", "error", "-y", *ins, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
