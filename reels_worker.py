@@ -251,7 +251,8 @@ def plan_de_efectos(proyecto, segs):
         d = {k: v for k, v in e.items() if k not in ("bruto", "start", "end", "id") and v not in (None, "")}
         d.update(start=round(a, 3), end=round(b, 3))
         if "ticks" in d:  # los ticks vienen en segundos del bruto
-            ts = [a_linea_de_tiempo(segs, e["bruto"], float(x)) for x in str(d["ticks"]).split("|")]
+            crudos = d["ticks"] if isinstance(d["ticks"], (list, tuple)) else re.split(r"[|,;\s]+", str(d["ticks"]).strip("[] "))
+            ts = [a_linea_de_tiempo(segs, e["bruto"], float(x)) for x in crudos if str(x).strip() != ""]
             d["ticks"] = "|".join(f"{x:.2f}" for x in ts if x is not None)
         plan.append(d)
     return sorted(plan, key=lambda d: d["start"])
