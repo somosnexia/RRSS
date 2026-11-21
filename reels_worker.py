@@ -31,7 +31,7 @@ W, H, FPS = 1080, 1920, 30
 
 # Efectos que ya muestran el texto en pantalla: mientras están activos no se ponen subtítulos.
 OCULTA_SUBS = {"timeline", "reject-stamp", "checklist", "comment-box", "todo", "split-headline", "headline-box",
-               "cover-star", "red-collage", "led-sign", "messages", "the-bill", "tier-list", "uninstall"}
+               "cover-star", "red-collage", "led-sign", "messages", "the-bill", "tier-list", "uninstall", "apple-toggles"}
 MAGENTA_ASS = "&H6E20E0&"  # #E0206E en BGR
 
 
@@ -340,7 +340,7 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
                 t = t.upper()
             limpia = _limpia(x["w"])
             partes.append("{\\c" + MAGENTA_ASS + "}" + t + "{\\c&HFFFFFF&}" if limpia in destacar else t)
-        efecto = (r"{\an2\pos(540,1380)\fad(120,80)}" if marca
+        efecto = (r"{\an2\pos(540,1580)\fad(120,80)}" if marca
                   else r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}")
         lineas.append(f"Dialogue: 1,{ts(a)},{ts(b)},{'Marca' if marca else 'Main'},,0,0,0,,{efecto}" + " ".join(partes))
     pasos = [str(x) for x in (cfg.get("pasos") or [])] if marca else []
@@ -360,10 +360,10 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
                 continue
             trozos = []
             for j, p in enumerate(pasos):
-                col = "&HFFFFFF&" if j == k else "&H99FFFFFF&"
-                trozos.append("{\\c" + col + "}" + f"{j + 1}  " + p.replace("{", "(").replace("}", ")"))
+                est = "{\\c&HFFFFFF&\\1a&H00&\\bord3}" if j == k else "{\\c&HFFFFFF&\\1a&H99&\\bord2}"
+                trozos.append(est + f"{j + 1}  " + p.replace("{", "(").replace("}", ")"))
             lineas.append(f"Dialogue: 1,{ts(a0)},{ts(b0)},Rotulo,,0,0,0,,"
-                          r"{\an8\pos(540,330)\fs38\fad(250,150)}" + "      ".join(trozos))
+                          r"{\an8\pos(540,300)\fs64\fad(250,150)}" + "     ".join(trozos))
     if marca and total:
         # Rótulo de marca: «somosnexia» discreto arriba al abrir y, al cerrar, un velo suave con el nombre centrado.
         lineas.append(f"Dialogue: 1,{ts(0.3)},{ts(2.3)},Rotulo,,0,0,0,,"
@@ -382,9 +382,9 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Main,Montserrat ExtraBold,70,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,6,2,2,80,80,560,1
-Style: Marca,Poppins SemiBold,54,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,0.4,0,1,2.6,1.5,2,110,110,560,1
-Style: Rotulo,Poppins SemiBold,44,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,6,0,1,1.5,1,8,80,80,210,1
-Style: Cierre,Poppins SemiBold,92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,8,0,1,0,2,5,80,80,0,1
+Style: Marca,Poppins SemiBold,84,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,0,0,1,5,3,2,90,90,560,1
+Style: Rotulo,Poppins SemiBold,62,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,3,0,1,2,2,8,80,80,210,1
+Style: Cierre,Poppins SemiBold,124,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,4,0,1,0,3,5,80,80,0,1
 Style: Velo,Poppins SemiBold,40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
