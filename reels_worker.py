@@ -343,6 +343,27 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
         efecto = (r"{\an2\pos(540,1380)\fad(120,80)}" if marca
                   else r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}")
         lineas.append(f"Dialogue: 1,{ts(a)},{ts(b)},{'Marca' if marca else 'Main'},,0,0,0,,{efecto}" + " ".join(partes))
+    pasos = [str(x) for x in (cfg.get("pasos") or [])] if marca else []
+    if pasos and total:
+        # Tira de pasos arriba: cada paso se ilumina cuando se nombra por primera vez.
+        ini = []
+        for k, p in enumerate(pasos):
+            clave = _limpia(p.split()[0])
+            t = next((w["s"] for w in limpias if _limpia(w["w"]) == clave and (not ini or w["s"] > ini[-1])), None)
+            ini.append(t if t is not None else (ini[-1] + 1 if ini else 0.8))
+        fin_tira = max(total - 2.6, 0)
+        inicios = [0.8] + ini[1:]
+        finales = ini[1:] + [fin_tira]
+        for k in range(len(pasos)):
+            a0, b0 = inicios[k], finales[k]
+            if b0 <= a0:
+                continue
+            trozos = []
+            for j, p in enumerate(pasos):
+                col = "&HFFFFFF&" if j == k else "&H99FFFFFF&"
+                trozos.append("{\\c" + col + "}" + f"{j + 1}  " + p.replace("{", "(").replace("}", ")"))
+            lineas.append(f"Dialogue: 1,{ts(a0)},{ts(b0)},Rotulo,,0,0,0,,"
+                          r"{\an8\pos(540,330)\fs38\fad(250,150)}" + "      ".join(trozos))
     if marca and total:
         # Rótulo de marca: «somosnexia» discreto arriba al abrir y, al cerrar, un velo suave con el nombre centrado.
         lineas.append(f"Dialogue: 1,{ts(0.3)},{ts(2.3)},Rotulo,,0,0,0,,"
