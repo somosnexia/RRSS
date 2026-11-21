@@ -305,8 +305,9 @@ def corregir(palabras, fixes):
     return out
 
 
-def subtitulos(proyecto, palabras, plan, dst):
+def subtitulos(proyecto, palabras, plan, dst, total=None):
     cfg = proyecto.get("subtitles", {})
+    marca = cfg.get("style") == "marca"
     destacar = {_limpia(x) for x in cfg.get("highlight") or []}
     ocultar = [(e["start"], e["end"]) for e in plan if e["fx"] in OCULTA_SUBS]
     limpias = corregir(palabras, cfg.get("fixes") or {})
@@ -334,11 +335,23 @@ def subtitulos(proyecto, palabras, plan, dst):
             continue
         partes = []
         for x in c:
-            t = x["w"].upper().replace("{", "(").replace("}", ")")
+            t = x["w"].replace("{", "(").replace("}", ")")
+            if not marca:
+                t = t.upper()
             limpia = _limpia(x["w"])
             partes.append("{\\c" + MAGENTA_ASS + "}" + t + "{\\c&HFFFFFF&}" if limpia in destacar else t)
-        lineas.append(f"Dialogue: 0,{ts(a)},{ts(b)},Main,,0,0,0,,"
-                      r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}" + " ".join(partes))
+        efecto = (r"{\an2\pos(540,1380)\fad(120,80)}" if marca
+                  else r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}")
+        lineas.append(f"Dialogue: 1,{ts(a)},{ts(b)},{'Marca' if marca else 'Main'},,0,0,0,,{efecto}" + " ".join(partes))
+    if marca and total:
+        # Rótulo de marca: «somosnexia» discreto arriba al abrir y, al cerrar, un velo suave con el nombre centrado.
+        lineas.append(f"Dialogue: 1,{ts(0.3)},{ts(2.3)},Rotulo,,0,0,0,,"
+                      r"{\an8\pos(540,210)\fad(500,500)}somosnexia")
+        t0 = max(total - 2.6, 0)
+        lineas.append(f"Dialogue: 0,{ts(t0)},{ts(total)},Velo,,0,0,0,,"
+                      r"{\p1\pos(0,0)\1c&H000000&\1a&H66&\fad(600,0)}m 0 0 l 1080 0 1080 1920 0 1920{\p0}")
+        lineas.append(f"Dialogue: 1,{ts(t0 + 0.2)},{ts(total)},Cierre,,0,0,0,,"
+                      r"{\an5\pos(540,900)\fad(600,0)}somosnexia")
     cab = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -348,6 +361,10 @@ WrapStyle: 0
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Main,Montserrat ExtraBold,70,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,6,2,2,80,80,560,1
+Style: Marca,Poppins SemiBold,54,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,0.4,0,1,2.6,1.5,2,110,110,560,1
+Style: Rotulo,Poppins SemiBold,44,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,6,0,1,1.5,1,8,80,80,210,1
+Style: Cierre,Poppins SemiBold,92,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,0,0,0,0,100,100,8,0,1,0,2,5,80,80,0,1
+Style: Velo,Poppins SemiBold,40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -375,7 +392,7 @@ def renderizar(job, token, folder, tmp):
     vf = []
     if proyecto.get("subtitles", {}).get("enabled", True):
         ass = os.path.join(tmp, "subs.ass")
-        subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass)
+        subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass, duracion(compo))
         vf = ["-vf", f"subtitles={ass}:fontsdir={FUENTES}"]
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", compo, "-map", "0:v", "-map", "1:a", *vf,
          "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
