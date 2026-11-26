@@ -22,6 +22,8 @@ import time
 import traceback
 import urllib.request
 
+import sonido
+
 RAIZ = os.path.dirname(os.path.abspath(__file__))
 FX = os.path.join(RAIZ, ".claude", "skills", "effects", "scripts", "fx.py")
 FUENTES = os.path.join(RAIZ, "fonts")
@@ -138,21 +140,44 @@ def fotogramas(path, dur, n=6):
 
 _modelo = None
 
+# Nombres que Whisper suele destrozar. A estos se suman los del guion de cada pieza.
+VOCABULARIO = ["Nexia", "Somos Nexia", "somosnexia", "Claude", "ChatGPT", "Gemini", "ManyChat", "CapCut", "Notion", "Make",
+               "Metricool", "Instagram", "TikTok", "LinkedIn", "WhatsApp", "Canva", "IA", "DMs", "reel", "radar", "Submarino"]
 
-def transcribir(path):
+
+def pistas(indicaciones):
+    """Vocabulario de ayuda para el transcriptor: el de siempre más los nombres propios y siglas del guion."""
+    propios = re.findall(r"(?<![\.\?!:¿¡]\s)(?<![¿¡\"«])(?<!^)\b([A-ZÁÉÍÓÚÑ][\wáéíóúñ]*[A-Z0-9]?[\wáéíóúñ]*)\b", indicaciones or "", flags=re.M)
+    vistos = []
+    for p in VOCABULARIO + propios:
+        if len(p) > 1 and p not in vistos:
+            vistos.append(p)
+    return ", ".join(vistos[:60])
+
+
+def modelo():
     global _modelo
-    from faster_whisper import WhisperModel
     if _modelo is None:
-        _modelo = WhisperModel(os.environ.get("WHISPER_MODEL", "small"), device="cpu", compute_type="int8")
+        from faster_whisper import WhisperModel
+        nombre = os.environ.get("WHISPER_MODEL", "large-v3-turbo")
+        try:
+            _modelo = WhisperModel(nombre, device="cpu", compute_type="int8")
+        except Exception as e:  # sin el modelo grande se sigue con el de antes antes que dejar el reel sin hacer
+            print(f"aviso: no se pudo cargar {nombre} ({e}); se usa small")
+            _modelo = WhisperModel("small", device="cpu", compute_type="int8")
+    return _modelo
+
+
+def transcribir(path, indicaciones=""):
     if not tiene_audio(path):
         return []  # vídeo sin sonido (p. ej. grabación de pantalla): no hay nada que transcribir
     # El audio se saca con ffmpeg (16 kHz mono) y no con PyAV: faster-whisper choca con algunas versiones de av.
-    import numpy as np
-    pcm = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", path, "-vn", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
-                         check=True, capture_output=True).stdout
-    audio = np.frombuffer(pcm, np.int16).astype(np.float32) / 32768.0
-    segs, _ = _modelo.transcribe(audio, language="es", word_timestamps=True, vad_filter=True)
-    return [{"w": w.word.strip(), "s": round(w.start, 2), "e": round(w.end, 2)} for s in segs for w in (s.words or [])]
+    audio = sonido.audio_de(path)
+    # Sin arrastrar el texto anterior: así no se inventa bucles y respeta mejor las repeticiones (que luego se cortan).
+    segs, _ = modelo().transcribe(audio, language="es", word_timestamps=True, vad_filter=True,
+                                  condition_on_previous_text=False, hotwords=pistas(indicaciones))
+    palabras = [{"w": w.word.strip(), "s": round(w.start, 2), "e": round(w.end, 2)} for s in segs for w in (s.words or [])]
+    return sonido.ajustar_palabras(palabras, audio)
 
 
 # ------------------------------------------------------------------ paso 1: transcripción y propuesta
@@ -169,7 +194,7 @@ def preparar(job, token, tmp):
             print(f"  bruto {i + 1}/{len(job['brutos'])} ({fid}): archivo vacío o ilegible ({os.path.getsize(src)} bytes), se omite")
             omitidos.append(fid)
             continue
-        brutos.append({"id": fid, "duration": dur, "words": transcribir(src)})
+        brutos.append({"id": fid, "duration": dur, "words": transcribir(src, job.get("indicaciones", ""))})
         try:
             frames.append(fotogramas(src, brutos[-1]["duration"]))
         except Exception:
@@ -195,11 +220,32 @@ def ajustar_a_palabras(proyecto):
         s["start"], s["end"] = round(max(0.0, a), 3), round(min(float(b["duration"]), e), 3)
 
 
-def montar(proyecto, rutas, dst):
+def afinar_cortes(proyecto, rutas, segs):
+    """Cada corte se lleva al punto más callado de al lado y se cuadra con los fotogramas (así imagen y sonido duran igual)."""
+    medidas = {}
+    for s in segs:
+        i = s["bruto"]
+        b = proyecto["brutos"][i]
+        a, e = float(s["start"]), float(s["end"])
+        dentro = [k for k, w in enumerate(b["words"]) if w["s"] >= a - 0.02 and w["e"] <= e + 0.08]
+        if dentro and tiene_audio(rutas[i]):
+            if i not in medidas:
+                medidas[i] = sonido.volumen(sonido.audio_de(rutas[i]))
+            p, u = dentro[0], dentro[-1]
+            a, e = sonido.afinar_corte(medidas[i], a, e, (b["words"][p]["s"], b["words"][p]["e"]), (b["words"][u]["s"], b["words"][u]["e"]),
+                                       b["words"][p - 1]["e"] if p > 0 else None,
+                                       b["words"][u + 1]["s"] if u + 1 < len(b["words"]) else None, float(b["duration"]))
+        a = round(a * FPS) / FPS
+        e = a + max(1, round((e - a) * FPS)) / FPS
+        s["start"], s["end"] = round(a, 4), round(e, 4)
+
+
+def montar(proyecto, rutas, dst, w=W, h=H, rapido=False):
     ajustar_a_palabras(proyecto)
     segs = [s for s in proyecto["segments"] if s.get("include", True)]
     if not segs:
         raise ValueError("El montaje no tiene ningún tramo activo")
+    afinar_cortes(proyecto, rutas, segs)
     ins, fc, sonido = [], [], {}
     # Fondo opcional: {"mode": "color", "color": "#RRGGBB"}. Solo se aplica a los brutos grabados sobre verde.
     cfg = proyecto.get("background") or {}
@@ -211,22 +257,23 @@ def montar(proyecto, rutas, dst):
         print("  fondo:", cfg["color"], "· brutos con pantalla verde:", [b for b, c in claves.items() if c] or "ninguno")
     for i, s in enumerate(segs):
         a, b = float(s["start"]), float(s["end"])
-        ins += ["-ss", f"{a:.3f}", "-t", f"{b - a:.3f}", "-i", rutas[s["bruto"]]]
+        ins += ["-ss", f"{a:.4f}", "-t", f"{b - a:.4f}", "-i", rutas[s["bruto"]]]
         if sonido.setdefault(s["bruto"], tiene_audio(rutas[s["bruto"]])):
             audio = f"[{i}:a]aresample=48000,afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,asetpts=PTS-STARTPTS[a{i}]"
         else:  # bruto sin audio: silencio de la misma duración para que el concat no falle
             audio = f"anullsrc=r=48000:cl=stereo:d={b - a:.3f},asetpts=PTS-STARTPTS[a{i}]"
-        base = f"[{i}:v]scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},fps={FPS},setsar=1,setpts=PTS-STARTPTS"
+        base = f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},fps={FPS},setsar=1,setpts=PTS-STARTPTS"
         clave = claves.get(s["bruto"])
         if fondo and clave:  # sustituye la pantalla verde por el color elegido (el desvío de verde limpia los bordes)
             fc.append(f"{base},chromakey={clave}:0.12:0.06,despill=type=green:mix=0.5:expand=0,format=yuva420p[k{i}];"
-                      f"color=c={fondo}:s={W}x{H}:r={FPS}:d={b - a:.3f}[bg{i}];[bg{i}][k{i}]overlay=shortest=1,format=yuv420p,setpts=PTS-STARTPTS[v{i}];" + audio)
+                      f"color=c={fondo}:s={w}x{h}:r={FPS}:d={b - a:.3f}[bg{i}];[bg{i}][k{i}]overlay=shortest=1,format=yuv420p,setpts=PTS-STARTPTS[v{i}];" + audio)
         else:
             fc.append(f"{base}[v{i}];" + audio)
     n = len(segs)
     fc.append("".join(f"[v{i}][a{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=1[v][a0];[a0]loudnorm=I=-14:TP=-1.5[a]")
     run(["ffmpeg", "-loglevel", "error", "-y", *ins, "-filter_complex", ";".join(fc), "-map", "[v]", "-map", "[a]",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-c:a", "aac", "-b:a", "192k", dst])
+         "-c:v", "libx264", "-preset", "ultrafast" if rapido else "veryfast", "-crf", "20" if rapido else "16",
+         "-c:a", "aac", "-b:a", "192k", dst])
     return segs
 
 
@@ -399,6 +446,42 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     open(dst, "w", encoding="utf-8").write(cab + "\n".join(lineas) + "\n")
 
 
+def reloj(t):
+    return f"{int(t // 60)}:{int(t % 60):02d}"
+
+
+def revisar(proyecto, segs, plan, compo):
+    """Lo que conviene mirar antes de dar el reel por bueno, medido por el programa (sin IA)."""
+    avisos = []
+    for e in proyecto.get("effects", []):
+        a = a_linea_de_tiempo(segs, e["bruto"], float(e["start"]))
+        b = a_linea_de_tiempo(segs, e["bruto"], float(e["end"]))
+        if a is None or b is None or b - a < 0.3:
+            avisos.append(f"El efecto «{e['fx']}» no ha salido: su momento está cortado o es demasiado corto.")
+    # Imagen congelada y silencios largos, medidos sobre el montaje (los efectos que paran la imagen no cuentan).
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", compo, "-vf", "freezedetect=n=-60dB:d=0.7",
+                        "-af", "silencedetect=n=-35dB:d=1.2", "-f", "null", "-"], capture_output=True, text=True)
+    quietas = [float(x) for x in re.findall(r"freeze_start: ([\d.]+)", r.stderr)]
+    for t in quietas[:3]:
+        avisos.append(f"La imagen se queda quieta en el {reloj(t)}.")
+    total = duracion(compo)
+    silencios = [(float(a), float(d)) for a, d in re.findall(r"silence_end: ([\d.]+) \| silence_duration: ([\d.]+)", r.stderr)]
+    for fin, dur in [x for x in silencios if x[0] < total - 0.3][:3]:
+        avisos.append(f"Hay {dur:.1f} s de silencio hacia el {reloj(fin - dur)}: se quita con «Quitar silencios».")
+    return avisos
+
+
+def papelera(token, file_id):
+    """Manda a la papelera de Drive (recuperable) un borrador que ya ha sido sustituido."""
+    req = urllib.request.Request(f"https://www.googleapis.com/drive/v3/files/{file_id}?supportsAllDrives=true",
+                                 data=json.dumps({"trashed": True}).encode(), method="PATCH",
+                                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
+    try:
+        urllib.request.urlopen(req, timeout=60).read()
+    except Exception as e:
+        print("aviso: no se pudo retirar el borrador anterior:", e)
+
+
 def renderizar(job, token, folder, tmp):
     update(job["id"], estado="Renderizando", error="")
     proyecto = drive_json(token, job["proyecto"])
@@ -406,14 +489,17 @@ def renderizar(job, token, folder, tmp):
     usados = {s["bruto"] for s in proyecto["segments"] if s.get("include", True)}
     for i in sorted(usados):
         rutas[i] = drive_download(token, proyecto["brutos"][i]["id"], os.path.join(tmp, f"b{i}.mp4"))
+    # Borrador: mitad de resolución y compresión rápida, para ver los cambios antes de generar el definitivo.
+    borrador = proyecto.get("borrador") is True
+    ancho, alto = (W // 2, H // 2) if borrador else (W, H)
     compo = os.path.join(tmp, "compo.mp4")
-    segs = montar(proyecto, rutas, compo)
+    segs = montar(proyecto, rutas, compo, ancho, alto, borrador)
     plan = plan_de_efectos(proyecto, segs)
     base = compo
     if plan:
         json.dump({"effects": plan}, open(os.path.join(tmp, "plan.json"), "w"), ensure_ascii=False)
         conefectos = os.path.join(tmp, "fx.mp4")
-        run([sys.executable, FX, "--plan", os.path.join(tmp, "plan.json"), compo, conefectos])
+        run([sys.executable, FX, "--plan", os.path.join(tmp, "plan.json"), "--width", str(ancho), compo, conefectos])
         base = conefectos
     final = os.path.join(tmp, "final.mp4")
     vf = []
@@ -422,14 +508,19 @@ def renderizar(job, token, folder, tmp):
         subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass, duracion(compo))
         vf = ["-vf", f"subtitles={ass}:fontsdir={FUENTES}"]
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", compo, "-map", "0:v", "-map", "1:a", *vf,
-         "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
+         "-c:v", "libx264", "-preset", "ultrafast" if borrador else "medium", "-crf", "26" if borrador else "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
          "-movflags", "+faststart", "-shortest", final])
-    version = int(job.get("version") or 0) + 1
-    nombre = f"{re.sub(r'[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ _-]', '', job['titulo']).strip() or 'Reel'} v{version}.mp4"
+    avisos = revisar(proyecto, segs, plan, compo)
+    version = int(job.get("version") or 0) + (0 if borrador else 1)
+    limpio = re.sub(r'[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ _-]', '', job['titulo']).strip() or 'Reel'
+    nombre = f"{limpio} BORRADOR.mp4" if borrador else f"{limpio} v{version}.mp4"
     video_id = drive_upload_video(token, final, nombre, folder)
     update(job["id"], estado="Para revisar", video=video_id, version=version,
-           resultado=f"https://drive.google.com/file/d/{video_id}/view", error="")
-    print(f"  listo: {nombre} ({duracion(final):.1f} s)")
+           resultado=f"https://drive.google.com/file/d/{video_id}/view" + ("#borrador" if borrador else ""), error="\n".join(avisos)[:1800])
+    # El borrador anterior ya no sirve (los vídeos definitivos nunca se tocan).
+    if str(job.get("resultado", "")).endswith("#borrador") and job.get("video"):
+        papelera(token, job["video"])
+    print(f"  listo: {nombre} ({duracion(final):.1f} s, {len(avisos)} aviso(s))")
 
 
 def main():
