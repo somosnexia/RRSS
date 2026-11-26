@@ -311,7 +311,7 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
     destacar = {_limpia(x) for x in cfg.get("highlight") or []}
     # Tamaño y posición pedidos en el panel; sin ellos manda el estilo.
     tam = cfg.get("tamano")
-    escala, max_car = {"grande": (1.2, 15), "pequeno": (0.82, 22)}.get(tam, (1.0, MAX_CARACTERES))
+    escala, max_car = {"grande": (1.4, 14), "pequeno": (0.82, 22)}.get(tam, (1.0, MAX_CARACTERES))
     letra = "" if escala == 1.0 else "\\fs%d" % round((72 if marca else 70) * escala)
     sitio = {"arriba": "\\an8\\pos(540,430)", "centro": "\\an5\\pos(540,1150)", "abajo": "\\an2\\pos(540,1580)"}.get(
         cfg.get("posicion"), "\\an2\\pos(540,1580)" if marca else "\\an2\\pos(540,1360)")
