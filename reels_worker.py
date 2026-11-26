@@ -525,11 +525,16 @@ def renderizar(job, token, folder, tmp):
     print(f"  listo: {nombre} ({duracion(final):.1f} s, {len(avisos)} aviso(s))")
 
 
-def main():
+def procesar(intentos):
+    """Atiende lo que haya en cola. Devuelve True si ha trabajado en algo."""
     info = api("GET", "/api/reels/worker")
-    jobs = info.get("jobs", [])
-    print(f"{len(jobs)} trabajo(s) pendiente(s)")
+    # Si un trabajo vuelve a aparecer una y otra vez (p. ej. no se pudo guardar su estado), se deja de insistir.
+    jobs = [j for j in info.get("jobs", []) if intentos.get((j["id"], j["estado"], j.get("proyecto")), 0) < 3]
+    if jobs:
+        print(f"{len(jobs)} trabajo(s) pendiente(s)")
     for job in jobs:
+        clave = (job["id"], job["estado"], job.get("proyecto"))
+        intentos[clave] = intentos.get(clave, 0) + 1
         print(f"- {job['estado']}: {job['titulo']}")
         with tempfile.TemporaryDirectory() as tmp:
             try:
@@ -545,6 +550,34 @@ def main():
                     pass
         # El token de Drive dura una hora: si quedan trabajos, se pide uno nuevo.
         info["token"] = api("GET", "/api/reels/worker?token=1").get("token", info["token"])
+    return bool(jobs)
+
+
+def main(pausa=20, vida=70 * 60):
+    """Tras acabar se queda un rato mirando la cola: mientras se está editando, cada cambio arranca en segundos.
+
+    ESPERA_MINUTOS: minutos sin trabajo antes de apagarse (0 = se apaga al acabar). `vida`: a partir de ahí ya no
+    espera más, para no llegar al límite de tiempo del trabajo de GitHub.
+    """
+    espera = float(os.environ.get("ESPERA_MINUTOS") or 0) * 60
+    inicio = libre_desde = time.time()
+    intentos, fallos = {}, 0
+    while True:
+        try:
+            # Primero una pregunta ligera; solo si hay algo se pide el trabajo y el permiso de Drive.
+            if api("GET", "/api/reels/worker?peek=1").get("pending", 0) and procesar(intentos):
+                libre_desde = time.time()
+            fallos = 0
+        except Exception:
+            traceback.print_exc()
+            fallos += 1
+            if fallos >= 5:
+                raise
+        ahora = time.time()
+        if espera <= 0 or ahora - libre_desde >= espera or ahora - inicio >= vida:
+            break
+        time.sleep(pausa)
+    print("motor apagado: sin trabajo pendiente")
 
 
 if __name__ == "__main__":
