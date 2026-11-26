@@ -215,11 +215,13 @@ def ajustar_a_palabras(proyecto):
     for s in proyecto["segments"]:
         b = proyecto["brutos"][s["bruto"]]
         a, e = float(s["start"]), float(s["end"])
-        for w in b["words"]:
+        words = b["words"]
+        for i, w in enumerate(words):
+            # Se incluye la palabra entera sin arrastrar la de al lado (el panel aplica esta misma regla).
             if w["s"] < a < w["e"] - 0.03:
-                a = w["s"] - 0.08
+                a = max(w["s"] - 0.08, min(words[i - 1]["e"] if i else 0.0, w["s"]))
             if w["s"] < e - 0.03 and w["e"] > e:
-                e = w["e"] + 0.15
+                e = min(w["e"] + 0.15, max(words[i + 1]["s"] if i + 1 < len(words) else float(b["duration"]), w["e"]))
         s["start"], s["end"] = round(max(0.0, a), 3), round(min(float(b["duration"]), e), 3)
 
 
