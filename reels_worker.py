@@ -22,6 +22,7 @@ import time
 import traceback
 import urllib.request
 
+import fondo
 import sonido
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
@@ -473,6 +474,27 @@ def revisar(proyecto, segs, plan, compo):
     return avisos
 
 
+def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp):
+    """Pone el fondo elegido detrás de la persona. Con «color», lo grabado en verde ya lo ha resuelto el montaje."""
+    cfg = proyecto.get("background") or {}
+    modo = cfg.get("mode")
+    color = str(cfg.get("color", ""))
+    if modo not in ("desenfoque", "color", "flujo") or (modo == "color" and not re.fullmatch(r"#[0-9A-Fa-f]{6}", color)):
+        return compo
+    verdes = {b: bool(verde_de_fondo(rutas[b])) for b in {s["bruto"] for s in segs}} if modo == "color" else {}
+    cortes, saltar, t = [], [], 0.0
+    for s in segs:
+        d = float(s["end"]) - float(s["start"])
+        cortes.append(t)
+        if verdes.get(s["bruto"]):
+            saltar.append((t, t + d))
+        t += d
+    if len(saltar) == len(segs):
+        return compo
+    salida = os.path.join(tmp, "fondo.mp4")
+    return fondo.aplicar(compo, salida, modo, color or "#133AE2", cortes, saltar, ancho, alto, FPS, borrador)
+
+
 def papelera(token, file_id):
     """Manda a la papelera de Drive (recuperable) un borrador que ya ha sido sustituido."""
     req = urllib.request.Request(f"https://www.googleapis.com/drive/v3/files/{file_id}?supportsAllDrives=true",
@@ -497,6 +519,8 @@ def renderizar(job, token, folder, tmp):
     compo = os.path.join(tmp, "compo.mp4")
     segs = montar(proyecto, rutas, compo, ancho, alto, borrador)
     plan = plan_de_efectos(proyecto, segs)
+    revisable = compo  # la revisión mira el vídeo antes de tocar el fondo (un fondo animado taparía una imagen congelada)
+    compo = cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp)
     base = compo
     if plan:
         json.dump({"effects": plan}, open(os.path.join(tmp, "plan.json"), "w"), ensure_ascii=False)
@@ -512,7 +536,7 @@ def renderizar(job, token, folder, tmp):
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", compo, "-map", "0:v", "-map", "1:a", *vf,
          "-c:v", "libx264", "-preset", "ultrafast" if borrador else "medium", "-crf", "26" if borrador else "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
          "-movflags", "+faststart", "-shortest", final])
-    avisos = revisar(proyecto, segs, plan, compo)
+    avisos = revisar(proyecto, segs, plan, revisable)
     version = int(job.get("version") or 0) + (0 if borrador else 1)
     limpio = re.sub(r'[^A-Za-z0-9áéíóúñÁÉÍÓÚÑ _-]', '', job['titulo']).strip() or 'Reel'
     nombre = f"{limpio} BORRADOR.mp4" if borrador else f"{limpio} v{version}.mp4"
