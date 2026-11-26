@@ -175,7 +175,9 @@ def transcribir(path, indicaciones=""):
     audio = sonido.audio_de(path)
     # Sin arrastrar el texto anterior: así no se inventa bucles y respeta mejor las repeticiones (que luego se cortan).
     segs, _ = modelo().transcribe(audio, language="es", word_timestamps=True, vad_filter=True,
-                                  condition_on_previous_text=False, hotwords=pistas(indicaciones))
+                                  condition_on_previous_text=False,
+                                  # Una frase bien puntuada como pista: así escribe los nombres y además pone comas y puntos.
+                                  hotwords=f"Hola, ¿qué tal? Hoy te hablo de {pistas(indicaciones)}. Vale, empezamos.")
     palabras = [{"w": w.word.strip(), "s": round(w.start, 2), "e": round(w.end, 2)} for s in segs for w in (s.words or [])]
     return sonido.ajustar_palabras(palabras, audio)
 
