@@ -309,11 +309,17 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
     cfg = proyecto.get("subtitles", {})
     marca = cfg.get("style") == "marca"
     destacar = {_limpia(x) for x in cfg.get("highlight") or []}
+    # Tamaño y posición pedidos en el panel; sin ellos manda el estilo.
+    tam = cfg.get("tamano")
+    escala, max_car = {"grande": (1.2, 15), "pequeno": (0.82, 22)}.get(tam, (1.0, MAX_CARACTERES))
+    letra = "" if escala == 1.0 else "\\fs%d" % round((72 if marca else 70) * escala)
+    sitio = {"arriba": "\\an8\\pos(540,430)", "centro": "\\an5\\pos(540,1150)", "abajo": "\\an2\\pos(540,1580)"}.get(
+        cfg.get("posicion"), "\\an2\\pos(540,1580)" if marca else "\\an2\\pos(540,1360)")
     ocultar = [(e["start"], e["end"]) for e in plan if e["fx"] in OCULTA_SUBS]
     limpias = corregir(palabras, cfg.get("fixes") or {})
     trozos, cur = [], []
     for w in limpias:
-        if cur and len(" ".join(x["w"] for x in cur + [w])) > MAX_CARACTERES:
+        if cur and len(" ".join(x["w"] for x in cur + [w])) > max_car:
             trozos.append(cur)
             cur = []
         cur.append(w)
@@ -340,8 +346,8 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
                 t = t.upper()
             limpia = _limpia(x["w"])
             partes.append("{\\c" + MAGENTA_ASS + "}" + t + "{\\c&HFFFFFF&}" if limpia in destacar else t)
-        efecto = (r"{\an2\pos(540,1580)\fad(120,80)}" if marca
-                  else r"{\an2\pos(540,1360)\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)}")
+        animacion = r"\fad(120,80)" if marca else r"\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)"
+        efecto = "{" + sitio + letra + animacion + "}"
         lineas.append(f"Dialogue: 1,{ts(a)},{ts(b)},{'Marca' if marca else 'Main'},,0,0,0,,{efecto}" + " ".join(partes))
     pasos = [str(x) for x in (cfg.get("pasos") or [])] if marca else []
     if pasos and total:
