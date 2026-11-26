@@ -556,17 +556,18 @@ def procesar(intentos):
 def main(pausa=20, vida=70 * 60):
     """Tras acabar se queda un rato mirando la cola: mientras se está editando, cada cambio arranca en segundos.
 
+    Si al arrancar no hay nada que hacer, se apaga enseguida (otro motor ya lo atendió): no gasta minutos.
     ESPERA_MINUTOS: minutos sin trabajo antes de apagarse (0 = se apaga al acabar). `vida`: a partir de ahí ya no
     espera más, para no llegar al límite de tiempo del trabajo de GitHub.
     """
     espera = float(os.environ.get("ESPERA_MINUTOS") or 0) * 60
     inicio = libre_desde = time.time()
-    intentos, fallos = {}, 0
+    intentos, fallos, trabajado = {}, 0, False
     while True:
         try:
             # Primero una pregunta ligera; solo si hay algo se pide el trabajo y el permiso de Drive.
             if api("GET", "/api/reels/worker?peek=1").get("pending", 0) and procesar(intentos):
-                libre_desde = time.time()
+                libre_desde, trabajado = time.time(), True
             fallos = 0
         except Exception:
             traceback.print_exc()
@@ -574,7 +575,7 @@ def main(pausa=20, vida=70 * 60):
             if fallos >= 5:
                 raise
         ahora = time.time()
-        if espera <= 0 or ahora - libre_desde >= espera or ahora - inicio >= vida:
+        if espera <= 0 or (not trabajado and not fallos) or ahora - libre_desde >= espera or ahora - inicio >= vida:
             break
         time.sleep(pausa)
     print("motor apagado: sin trabajo pendiente")
