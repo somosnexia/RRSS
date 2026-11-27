@@ -229,6 +229,9 @@ def ajustar_a_palabras(proyecto):
 def afinar_cortes(proyecto, rutas, segs):
     """Cada corte se lleva al punto más callado de al lado y se cuadra con los fotogramas (así imagen y sonido duran igual)."""
     medidas = {}
+    # Trozos partidos por la mitad en el panel: van seguidos en el mismo bruto y tienen que seguir sonando de corrido.
+    for k, s in enumerate(segs):
+        s["unido"] = k > 0 and segs[k - 1]["bruto"] == s["bruto"] and abs(float(s["start"]) - float(segs[k - 1]["end"])) < 0.02
     for s in segs:
         i = s["bruto"]
         b = proyecto["brutos"][i]
@@ -244,6 +247,10 @@ def afinar_cortes(proyecto, rutas, segs):
         a = round(a * FPS) / FPS
         e = a + max(1, round((e - a) * FPS)) / FPS
         s["start"], s["end"] = round(a, 4), round(e, 4)
+    for k, s in enumerate(segs):
+        if s["unido"]:  # el anterior acaba justo donde empieza este: ni se repite ni se pierde nada
+            antes = segs[k - 1]
+            antes["end"] = round(antes["start"] + max(1, round((s["start"] - antes["start"]) * FPS)) / FPS, 4)
 
 
 def montar(proyecto, rutas, dst, w=W, h=H, rapido=False):
@@ -265,7 +272,9 @@ def montar(proyecto, rutas, dst, w=W, h=H, rapido=False):
         a, b = float(s["start"]), float(s["end"])
         ins += ["-ss", f"{a:.4f}", "-t", f"{b - a:.4f}", "-i", rutas[s["bruto"]]]
         if sonido.setdefault(s["bruto"], tiene_audio(rutas[s["bruto"]])):
-            audio = f"[{i}:a]aresample=48000,afade=t=in:d=0.03,afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,asetpts=PTS-STARTPTS[a{i}]"
+            entrada = "" if s.get("unido") else "afade=t=in:d=0.03,"
+            salida = "" if i + 1 < len(segs) and segs[i + 1].get("unido") else f"afade=t=out:st={max(0, b - a - 0.04):.2f}:d=0.04,"
+            audio = f"[{i}:a]aresample=48000,{entrada}{salida}asetpts=PTS-STARTPTS[a{i}]"
         else:  # bruto sin audio: silencio de la misma duración para que el concat no falle
             audio = f"anullsrc=r=48000:cl=stereo:d={b - a:.3f},asetpts=PTS-STARTPTS[a{i}]"
         base = f"[{i}:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},fps={FPS},setsar=1,setpts=PTS-STARTPTS"
