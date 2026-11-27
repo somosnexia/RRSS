@@ -23,6 +23,7 @@ import traceback
 import urllib.request
 
 import fondo
+import musica
 import sonido
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
@@ -532,13 +533,21 @@ def renderizar(job, token, folder, tmp):
         conefectos = os.path.join(tmp, "fx.mp4")
         run([sys.executable, FX, "--plan", os.path.join(tmp, "plan.json"), "--width", str(ancho), compo, conefectos])
         base = conefectos
+    sonido_final = compo
+    cancion = proyecto.get("music") or {}
+    if cancion.get("id"):
+        try:
+            pista = drive_download(token, cancion["id"], os.path.join(tmp, "musica"))
+            sonido_final = musica.mezclar(compo, pista, cancion.get("volumen"), cancion.get("desde"), duracion(compo), tmp)
+        except Exception as e:  # mejor decirlo que entregar el vídeo sin música sin avisar
+            raise RuntimeError(f"No he podido usar la canción «{cancion.get('name', '')}»: {e}") from None
     final = os.path.join(tmp, "final.mp4")
     vf = []
     if proyecto.get("subtitles", {}).get("enabled", True):
         ass = os.path.join(tmp, "subs.ass")
         subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass, duracion(compo))
         vf = ["-vf", f"subtitles={ass}:fontsdir={FUENTES}"]
-    run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", compo, "-map", "0:v", "-map", "1:a", *vf,
+    run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", sonido_final, "-map", "0:v", "-map", "1:a", *vf,
          "-c:v", "libx264", "-preset", "ultrafast" if borrador else "medium", "-crf", "26" if borrador else "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
          "-movflags", "+faststart", "-shortest", final])
     avisos = revisar(proyecto, segs, plan, revisable)
