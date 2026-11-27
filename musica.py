@@ -21,6 +21,12 @@ def _segundos(path):
         return 0.0
 
 
+def _canales(path):
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=channels", "-of", "csv=p=0", path],
+                       capture_output=True, text=True)
+    return int(r.stdout.strip() or 2)
+
+
 def mezclar(video, cancion, volumen, desde, dur, tmp):
     """Devuelve un .m4a con la voz de `video` y la `cancion` debajo, de `dur` segundos.
 
@@ -36,10 +42,12 @@ def mezclar(video, cancion, volumen, desde, dur, tmp):
     _ffmpeg(["-ss", f"{inicio:.2f}", "-i", cancion, "-vn", "-ac", "2", "-ar", "48000", "-t", f"{dur:.2f}", trozo])
     salida = os.path.join(tmp, "mezcla.m4a")
     cierre = min(1.5, dur / 4)
+    # Una voz grabada en mono se copia tal cual a los dos lados: convertirla sin más la dejaría 3 dB más baja.
+    estereo = "pan=stereo|c0=c0|c1=c0" if _canales(video) == 1 else "aformat=channel_layouts=stereo"
     filtro = (
         f"[1:a]loudnorm=I={NIVEL.get(volumen, NIVEL['suave'])}:TP=-2,aresample=48000,"
         f"afade=t=in:d=0.4,afade=t=out:st={max(dur - cierre, 0):.2f}:d={cierre:.2f}[m];"
-        "[0:a]aresample=48000,aformat=channel_layouts=stereo,asplit=2[voz][llave];"
+        f"[0:a]aresample=48000,{estereo},asplit=2[voz][llave];"
         "[m][llave]sidechaincompress=threshold=0.03:ratio=4:attack=20:release=400[bajo];"
         "[voz][bajo]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95:level=false[a]"
     )
