@@ -489,12 +489,12 @@ def revisar(proyecto, segs, plan, compo):
     return avisos
 
 
-def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp):
+def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video=None):
     """Pone el fondo elegido detrás de la persona. Con «color», lo grabado en verde ya lo ha resuelto el montaje."""
     cfg = proyecto.get("background") or {}
     modo = cfg.get("mode")
     color = str(cfg.get("color", ""))
-    if modo not in ("desenfoque", "color", "flujo") or (modo == "color" and not re.fullmatch(r"#[0-9A-Fa-f]{6}", color)):
+    if modo not in ("desenfoque", "color", "flujo", "video") or (modo == "video" and not video) or (modo == "color" and not re.fullmatch(r"#[0-9A-Fa-f]{6}", color)):
         return compo
     verdes = {b: bool(verde_de_fondo(rutas[b])) for b in {s["bruto"] for s in segs}} if modo == "color" else {}
     cortes, saltar, t = [], [], 0.0
@@ -507,7 +507,7 @@ def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp):
     if len(saltar) == len(segs):
         return compo
     salida = os.path.join(tmp, "fondo.mp4")
-    return fondo.aplicar(compo, salida, modo, color or "#133AE2", cortes, saltar, ancho, alto, FPS, borrador)
+    return fondo.aplicar(compo, salida, modo, color or "#133AE2", cortes, saltar, ancho, alto, FPS, borrador, video, cfg.get("persona"))
 
 
 def papelera(token, file_id):
@@ -535,7 +535,16 @@ def renderizar(job, token, folder, tmp):
     segs = montar(proyecto, rutas, compo, ancho, alto, borrador)
     plan = plan_de_efectos(proyecto, segs)
     revisable = compo  # la revisión mira el vídeo antes de tocar el fondo (un fondo animado taparía una imagen congelada)
-    compo = cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp)
+    detras = proyecto.get("background") or {}
+    video_fondo = None
+    if detras.get("mode") == "video":
+        elegido = detras.get("video") or {}
+        try:
+            video_fondo = drive_download(token, elegido["id"], os.path.join(tmp, "fondo-propio"))
+            duracion(video_fondo)
+        except Exception as e:
+            raise RuntimeError(f"No he podido usar el vídeo de fondo «{elegido.get('name', '')}»: {e}") from None
+    compo = cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video_fondo)
     base = compo
     if plan:
         json.dump({"effects": plan}, open(os.path.join(tmp, "plan.json"), "w"), ensure_ascii=False)

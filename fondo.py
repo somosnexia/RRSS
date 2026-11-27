@@ -1,4 +1,4 @@
-"""Fondo detrás de la persona: desenfocado, color liso o «flujo Nexia» (animado, de la marca).
+"""Fondo detrás de la persona: desenfocado, color liso, «flujo Nexia» (animado, de la marca) o un vídeo propio.
 
 La persona se recorta con el mismo modelo local que usan los efectos (MediaPipe Selfie Segmenter): no consulta
 ningún servicio. El recorte puede fallar un poco en el pelo o con objetos en la mano; con pantalla verde sale más limpio.
@@ -131,13 +131,48 @@ def desenfocado(frame, m):
     return cv2.resize((num / den) * 0.92, (w, h), interpolation=cv2.INTER_CUBIC)
 
 
+class VideoDeFondo:
+    """Un vídeo propio detrás: se recorta para llenar la pantalla, se repite si es corto y va sin su sonido."""
+
+    def __init__(self, path, w, h, fps):
+        self.w, self.h = w, h
+        self.p = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", path, "-an", "-vf",
+                                   f"fps={fps},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},format=rgb24",
+                                   "-f", "rawvideo", "-"], stdout=subprocess.PIPE, bufsize=10 ** 8)
+
+    def __call__(self, t):
+        b = self.p.stdout.read(self.w * self.h * 3)
+        if len(b) < self.w * self.h * 3:
+            raise RuntimeError("el vídeo de fondo no se puede leer")
+        return np.frombuffer(b, np.uint8).reshape(self.h, self.w, 3)
+
+    def cerrar(self):
+        self.p.kill()
+        self.p.wait()
+
+
+def encoger(frame, m, escala=0.62):
+    """La persona más pequeña, apoyada abajo en el centro, para dejar ver lo que hay detrás."""
+    h, w = m.shape
+    # Donde tocaba los lados del encuadre original se difumina: encogida, ahí quedaría un corte recto.
+    borde = max(2, int(w * 0.05))
+    rampa = np.ones(w, np.float32)
+    rampa[:borde] = np.linspace(0, 1, borde, dtype=np.float32)
+    rampa[-borde:] = rampa[:borde][::-1]
+    M = np.float32([[escala, 0, w * (1 - escala) / 2], [0, escala, h * (1 - escala)]])
+    chica = cv2.warpAffine(frame, M, (w, h), flags=cv2.INTER_AREA, borderMode=cv2.BORDER_CONSTANT)
+    return chica, cv2.warpAffine(m * rampa[None, :], M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
+
 # ------------------------------------------------------------------ proceso
 
-def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=1080, alto=1920, fps=30, rapido=False):
+def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=1080, alto=1920, fps=30, rapido=False,
+            video=None, persona="normal"):
     """entrada -> salida con el fondo cambiado (el sonido se copia tal cual).
 
     cortes: segundos donde cambia de toma (se olvida el recorte anterior). saltar: tramos (desde, hasta) que ya traen
-    el fondo puesto (pantalla verde) y se dejan como están.
+    el fondo puesto (pantalla verde) y se dejan como están. video: el archivo de fondo (modo «video»).
+    persona: «pequena» la coloca más pequeña abajo.
     """
     lee = subprocess.Popen(["ffmpeg", "-v", "error", "-i", entrada, "-vf", f"fps={fps},scale={ancho}:{alto},format=rgb24", "-f", "rawvideo", "-"],
                            stdout=subprocess.PIPE, bufsize=10 ** 8)
@@ -146,6 +181,7 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
                                 "-crf", "20" if rapido else "16", "-pix_fmt", "yuv420p", "-c:a", "copy", salida], stdin=subprocess.PIPE)
     recorte = Recorte()
     flujo = Flujo(ancho, alto) if modo == "flujo" else None
+    propio = VideoDeFondo(video, ancho, alto, fps) if modo == "video" else None
     liso = np.float32([int(color[i:i + 2], 16) for i in (1, 3, 5)]) if modo == "color" else None
     mw, mh = 540, int(round(540 * alto / ancho / 2)) * 2
     pendientes = sorted(c for c in cortes if c > 0)
@@ -160,6 +196,7 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
             while pendientes and t >= pendientes[0] - 0.5 / fps:
                 pendientes.pop(0)
                 recorte.antes = None
+            detras = propio(t) if propio else None  # avanza siempre, para que el fondo no se pare en ningún tramo
             if not any(a - 0.5 / fps <= t < z - 0.5 / fps for a, z in saltar):
                 m = recorte(cv2.resize(frame, (mw, mh), interpolation=cv2.INTER_AREA), int(n * 1000 / fps))
                 m = cv2.resize(m, (ancho, alto), interpolation=cv2.INTER_LINEAR)
@@ -167,8 +204,12 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
                     atras = cv2.resize(flujo(t), (ancho, alto), interpolation=cv2.INTER_LINEAR).astype(np.float32)
                 elif modo == "color":
                     atras = liso
+                elif modo == "video":
+                    atras = detras.astype(np.float32)
                 else:
                     atras = desenfocado(frame, m)
+                if persona == "pequena" and modo != "desenfoque":
+                    frame, m = encoger(frame, m)
                 a = m[..., None]
                 frame = np.clip(frame.astype(np.float32) * a + atras * (1 - a) + 0.5, 0, 255).astype(np.uint8)
             escribe.stdin.write(frame.tobytes())
@@ -176,6 +217,8 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
                 print(f"  fondo {t:5.1f}s", flush=True)
             n += 1
     finally:
+        if propio:
+            propio.cerrar()
         lee.kill()
         lee.wait()
         escribe.stdin.close()
