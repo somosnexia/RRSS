@@ -299,12 +299,22 @@ def fx_lean_in(c, e):
     face_cam(c, 1 + (z - 1) * ease_out(c.lt / float(e.o.get('speed', 0.18))), 0.42)
 
 
+def head_top(c):
+    """First row of the person mask above the face (hair included)."""
+    x0 = max(0, min(int(c.fx - c.fw * 0.7), c.W - 2)); x1 = max(x0 + 1, min(int(c.fx + c.fw * 0.7), c.W))
+    rows = np.flatnonzero((c.m[:, x0:x1] > 0.5).mean(axis=1) > 0.08)
+    return float(rows[0]) if len(rows) else c.fy - c.fw
+
+
 @effect('backdrop-word', 'a giant word drops in behind you')
 def fx_backdrop_word(c, e):
-    word = e.o.get('text', 'CLAUDE')
+    word = e.o.get('text')
+    if not word: return
     im = cached(e, 'w', lambda: fit_text(word, c.W * 0.94, e.o.get('font', 'bold'), fill=rgb(e.o.get('color'), CREAM), shadow=10))
     k = ease_back(c.lt / 0.42)
-    y_end = c.fy - c.fw * 1.05
+    # Mostly above the hair (only its lower edge hides behind the head), never off the top of the frame.
+    top = cached(e, 'top', lambda: head_top(c))
+    y_end = max(c.H * 0.14 + im.height / 2, min(c.fy - c.fw * 1.05, top - im.height * 0.15))
     y = -im.height + (y_end + im.height) * k
     place(c, im, c.W / 2 * 0.6 + c.fx * 0.4, y, alpha=clamp((e.d - c.lt) / 0.2), behind=True)
 

@@ -368,6 +368,8 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
     sitio = {"arriba": "\\an8\\pos(540,430)", "centro": "\\an5\\pos(540,1150)", "abajo": "\\an2\\pos(540,1580)"}.get(
         cfg.get("posicion"), "\\an2\\pos(540,1580)" if marca else "\\an2\\pos(540,1360)")
     ocultar = [(e["start"], e["end"]) for e in plan if e["fx"] in OCULTA_SUBS]
+    # La palabra gigante ocupa la parte alta: mientras está, los subtítulos de «arriba» bajan.
+    gigante = [(e["start"], e["end"]) for e in plan if e["fx"] == "backdrop-word"] if cfg.get("posicion") == "arriba" else []
     limpias = corregir(palabras, cfg.get("fixes") or {})
     trozos, cur = [], []
     for w in limpias:
@@ -399,7 +401,8 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
             limpia = _limpia(x["w"])
             partes.append("{\\c" + MAGENTA_ASS + "}" + t + "{\\c&HFFFFFF&}" if limpia in destacar else t)
         animacion = r"\fad(120,80)" if marca else r"\fad(40,0)\t(0,90,\fscx108\fscy108)\t(90,160,\fscx100\fscy100)"
-        efecto = "{" + sitio + letra + animacion + "}"
+        donde = "\\an2\\pos(540,1580)" if any(a < y and b > x for x, y in gigante) else sitio
+        efecto = "{" + donde + letra + animacion + "}"
         lineas.append(f"Dialogue: 1,{ts(a)},{ts(b)},{'Marca' if marca else 'Main'},,0,0,0,,{efecto}" + " ".join(partes))
     pasos = [str(x) for x in (cfg.get("pasos") or [])] if marca else []
     if pasos and total:
