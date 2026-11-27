@@ -132,23 +132,54 @@ def desenfocado(frame, m):
 
 
 class VideoDeFondo:
-    """Un vídeo propio detrás: se recorta para llenar la pantalla, se repite si es corto y va sin su sonido."""
+    """Un vídeo propio detrás: se repite si es corto y va sin su sonido.
+
+    Cada fotograma llega en dos versiones: recortado para llenar la pantalla y entero (para «enseñar pantalla»).
+    """
 
     def __init__(self, path, w, h, fps):
         self.w, self.h = w, h
-        self.p = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", path, "-an", "-vf",
-                                   f"fps={fps},scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},format=rgb24",
-                                   "-f", "rawvideo", "-"], stdout=subprocess.PIPE, bufsize=10 ** 8)
+        self.alto_entero = int(h * 0.52) // 2 * 2
+        filtro = (f"[0:v]fps={fps},split[a][b];"
+                  f"[a]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},format=rgba[lleno];"
+                  f"[b]scale={w}:{self.alto_entero}:force_original_aspect_ratio=decrease,format=rgba,"
+                  f"pad={w}:{self.alto_entero}:(ow-iw)/2:0:color=black@0[entero];[lleno][entero]vstack,format=rgba[v]")
+        self.tam = w * (h + self.alto_entero) * 4
+        self.p = subprocess.Popen(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", path, "-filter_complex", filtro,
+                                   "-map", "[v]", "-f", "rawvideo", "-pix_fmt", "rgba", "-"], stdout=subprocess.PIPE, bufsize=10 ** 8)
 
     def __call__(self, t):
-        b = self.p.stdout.read(self.w * self.h * 3)
-        if len(b) < self.w * self.h * 3:
+        """-> (lleno RGB, entero RGBA) del siguiente fotograma."""
+        b = self.p.stdout.read(self.tam)
+        if len(b) < self.tam:
             raise RuntimeError("el vídeo de fondo no se puede leer")
-        return np.frombuffer(b, np.uint8).reshape(self.h, self.w, 3)
+        todo = np.frombuffer(b, np.uint8).reshape(self.h + self.alto_entero, self.w, 4)
+        return todo[:self.h, :, :3], todo[self.h:]
 
     def cerrar(self):
         self.p.kill()
         self.p.wait()
+
+
+def vista_entera(lleno, entero):
+    """El vídeo completo en la parte de arriba, sobre una copia suya borrosa y oscura que llena el resto."""
+    h, w = lleno.shape[:2]
+    chico = cv2.resize(lleno, (w // 8, h // 8), interpolation=cv2.INTER_AREA).astype(np.float32)
+    img = cv2.resize(cv2.GaussianBlur(chico, (0, 0), 4) * 0.4, (w, h), interpolation=cv2.INTER_LINEAR)
+    y = int(h * 0.08)
+    zona = img[y:y + entero.shape[0]]
+    a = entero[..., 3:].astype(np.float32) / 255
+    img[y:y + entero.shape[0]] = zona * (1 - a) + entero[..., :3].astype(np.float32) * a
+    return img
+
+
+def fuerza(t, ventanas, paso=0.35):
+    """Cuánto está puesto «enseñar pantalla» en el segundo t: de 0 a 1, entrando y saliendo con suavidad."""
+    k = 0.0
+    for a, b in ventanas:
+        x = max(0.0, min(1.0, (t - a) / paso, (b - t) / paso))
+        k = max(k, x * x * (3 - 2 * x))
+    return k
 
 
 def encoger(frame, m, escala=0.62):
@@ -159,20 +190,22 @@ def encoger(frame, m, escala=0.62):
     rampa = np.ones(w, np.float32)
     rampa[:borde] = np.linspace(0, 1, borde, dtype=np.float32)
     rampa[-borde:] = rampa[:borde][::-1]
+    rampa = 1 - (1 - rampa) * min(1.0, (1 - escala) / 0.3)
     M = np.float32([[escala, 0, w * (1 - escala) / 2], [0, escala, h * (1 - escala)]])
     chica = cv2.warpAffine(frame, M, (w, h), flags=cv2.INTER_AREA, borderMode=cv2.BORDER_CONSTANT)
-    return chica, cv2.warpAffine(m * rampa[None, :], M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return chica, cv2.warpAffine(m * rampa[None, :].astype(np.float32), M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
 
 # ------------------------------------------------------------------ proceso
 
 def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=1080, alto=1920, fps=30, rapido=False,
-            video=None, persona="normal"):
+            video=None, persona="normal", ventanas=()):
     """entrada -> salida con el fondo cambiado (el sonido se copia tal cual).
 
     cortes: segundos donde cambia de toma (se olvida el recorte anterior). saltar: tramos (desde, hasta) que ya traen
     el fondo puesto (pantalla verde) y se dejan como están. video: el archivo de fondo (modo «video»).
-    persona: «pequena» la coloca más pequeña abajo.
+    persona: «pequena» la coloca más pequeña abajo. ventanas: ratos (desde, hasta) de «enseñar pantalla»: la persona
+    se hace pequeña y el vídeo de fondo se ve entero.
     """
     lee = subprocess.Popen(["ffmpeg", "-v", "error", "-i", entrada, "-vf", f"fps={fps},scale={ancho}:{alto},format=rgb24", "-f", "rawvideo", "-"],
                            stdout=subprocess.PIPE, bufsize=10 ** 8)
@@ -197,6 +230,7 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
                 pendientes.pop(0)
                 recorte.antes = None
             detras = propio(t) if propio else None  # avanza siempre, para que el fondo no se pare en ningún tramo
+            k = fuerza(t, ventanas)
             if not any(a - 0.5 / fps <= t < z - 0.5 / fps for a, z in saltar):
                 m = recorte(cv2.resize(frame, (mw, mh), interpolation=cv2.INTER_AREA), int(n * 1000 / fps))
                 m = cv2.resize(m, (ancho, alto), interpolation=cv2.INTER_LINEAR)
@@ -205,11 +239,17 @@ def aplicar(entrada, salida, modo, color="#133AE2", cortes=(), saltar=(), ancho=
                 elif modo == "color":
                     atras = liso
                 elif modo == "video":
-                    atras = detras.astype(np.float32)
+                    lleno, entero = detras
+                    atras = lleno.astype(np.float32)
+                    if k > 0:
+                        atras = atras * (1 - k) + vista_entera(lleno, entero) * k
                 else:
                     atras = desenfocado(frame, m)
-                if persona == "pequena" and modo != "desenfoque":
-                    frame, m = encoger(frame, m)
+                if modo != "desenfoque":
+                    base = 0.62 if persona == "pequena" else 1.0
+                    escala = base + (0.55 - base) * k
+                    if escala < 0.999:
+                        frame, m = encoger(frame, m, escala)
                 a = m[..., None]
                 frame = np.clip(frame.astype(np.float32) * a + atras * (1 - a) + 0.5, 0, 255).astype(np.uint8)
             escribe.stdin.write(frame.tobytes())

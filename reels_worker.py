@@ -303,6 +303,18 @@ def a_linea_de_tiempo(segs, bruto, t):
     return None
 
 
+def ratos_de_pantalla(plan, total):
+    """Los ratos de «enseñar pantalla», juntando los que casi se tocan (para no crecer y encoger en medio segundo)."""
+    ratos = []
+    for a, b in sorted((float(e["start"]), float(e["end"])) for e in plan if e["fx"] == "pantalla"):
+        if ratos and a - ratos[-1][1] < 0.6:
+            ratos[-1][1] = max(ratos[-1][1], b)
+        else:
+            ratos.append([a, b])
+    # Si empieza con el vídeo o llega hasta el final, ahí no hay transición.
+    return [(-1.0 if a <= 0.15 else a, total + 1 if b >= total - 0.15 else b) for a, b in ratos]
+
+
 def plan_de_efectos(proyecto, segs):
     plan = []
     for e in proyecto.get("effects", []):
@@ -367,7 +379,7 @@ def corregir(palabras, fixes):
     return out
 
 
-def subtitulos(proyecto, palabras, plan, dst, total=None):
+def subtitulos(proyecto, palabras, plan, dst, total=None, pantallas=()):
     cfg = proyecto.get("subtitles", {})
     marca = cfg.get("style") == "marca"
     destacar = {_limpia(x) for x in cfg.get("highlight") or []}
@@ -379,7 +391,7 @@ def subtitulos(proyecto, palabras, plan, dst, total=None):
         cfg.get("posicion"), "\\an2\\pos(540,1580)" if marca else "\\an2\\pos(540,1360)")
     ocultar = [(e["start"], e["end"]) for e in plan if e["fx"] in OCULTA_SUBS]
     # La palabra gigante ocupa la parte alta: mientras está, los subtítulos de «arriba» bajan.
-    gigante = [(e["start"], e["end"]) for e in plan if e["fx"] == "backdrop-word"] if cfg.get("posicion") == "arriba" else []
+    gigante = ([(e["start"], e["end"]) for e in plan if e["fx"] == "backdrop-word"] + list(pantallas)) if cfg.get("posicion") == "arriba" else []
     limpias = corregir(palabras, cfg.get("fixes") or {})
     trozos, cur = [], []
     for w in limpias:
@@ -489,7 +501,7 @@ def revisar(proyecto, segs, plan, compo):
     return avisos
 
 
-def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video=None):
+def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video=None, ventanas=()):
     """Pone el fondo elegido detrás de la persona. Con «color», lo grabado en verde ya lo ha resuelto el montaje."""
     cfg = proyecto.get("background") or {}
     modo = cfg.get("mode")
@@ -507,7 +519,7 @@ def cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, vide
     if len(saltar) == len(segs):
         return compo
     salida = os.path.join(tmp, "fondo.mp4")
-    return fondo.aplicar(compo, salida, modo, color or "#133AE2", cortes, saltar, ancho, alto, FPS, borrador, video, cfg.get("persona"))
+    return fondo.aplicar(compo, salida, modo, color or "#133AE2", cortes, saltar, ancho, alto, FPS, borrador, video, cfg.get("persona"), ventanas)
 
 
 def papelera(token, file_id):
@@ -544,7 +556,9 @@ def renderizar(job, token, folder, tmp):
             duracion(video_fondo)
         except Exception as e:
             raise RuntimeError(f"No he podido usar el vídeo de fondo «{elegido.get('name', '')}»: {e}") from None
-    compo = cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video_fondo)
+    pantallas = ratos_de_pantalla(plan, duracion(compo))
+    plan = [e for e in plan if e["fx"] != "pantalla"]  # no es un efecto de fx.py: lo resuelve el fondo
+    compo = cambiar_fondo(proyecto, rutas, segs, compo, ancho, alto, borrador, tmp, video_fondo, pantallas)
     base = compo
     if plan:
         json.dump({"effects": plan}, open(os.path.join(tmp, "plan.json"), "w"), ensure_ascii=False)
@@ -563,7 +577,7 @@ def renderizar(job, token, folder, tmp):
     vf = []
     if proyecto.get("subtitles", {}).get("enabled", True):
         ass = os.path.join(tmp, "subs.ass")
-        subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass, duracion(compo))
+        subtitulos(proyecto, palabras_montaje(proyecto, segs), plan, ass, duracion(compo), pantallas)
         vf = ["-vf", f"subtitles={ass}:fontsdir={FUENTES}"]
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", base, "-i", sonido_final, "-map", "0:v", "-map", "1:a", *vf,
          "-c:v", "libx264", "-preset", "ultrafast" if borrador else "medium", "-crf", "26" if borrador else "19", "-pix_fmt", "yuv420p", "-c:a", "copy",
