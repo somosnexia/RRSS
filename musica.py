@@ -3,7 +3,7 @@ import os
 import subprocess
 
 # Sonoridad de la música antes de apartarse (la voz del montaje va a -14 LUFS).
-NIVEL = {"suave": -27, "normal": -22, "alta": -17}
+NIVEL = {"muy-suave": -33, "suave": -27, "normal": -22, "alta": -17}
 
 
 def _ffmpeg(args):
